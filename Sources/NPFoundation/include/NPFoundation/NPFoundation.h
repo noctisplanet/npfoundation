@@ -6,4 +6,5 @@
 //
 
 #include <NPFoundation/Definitions.h>
-#include <NPFoundation/NSObjCRuntime.h>
+#include <NPFoundation/dispatch.h>
+#include <NPFoundation/objc.h>
