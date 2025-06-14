@@ -14,7 +14,7 @@
 
 NP_CEXTERN_BEGIN
 
-NP_EXTERN void NPDispatchOnce(dispatch_once_t *predicate, void(*func)(void));
+NP_EXTERN void NPDispatchOnce(dispatch_once_t * _Nullable predicate, void(* _Nullable func)(void));
 
 NP_CEXTERN_END
 

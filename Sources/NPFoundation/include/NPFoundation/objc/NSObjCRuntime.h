@@ -12,6 +12,14 @@
 #include <objc/runtime.h>
 #include <NPFoundation/Definitions.h>
 
+NP_CEXTERN_BEGIN
+
+NP_EXTERN Method _Nullable NPClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name);
+
+NP_EXTERN Method _Nullable NPClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name);
+
+NP_CEXTERN_END
+
 // A >> A
 #define _NP_GUARD_(A) A
 // (id self, SEL name, ) >> (id self, )
@@ -29,23 +37,55 @@
 
 /// class_addMethod
 ///
-#define NP_CLASS_ADDMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                  \
-    do {                                                                                            \
-        Class          __cls = (CLASS);                                                             \
-        SEL            __sel = (SELECTOR);                                                          \
-        if (!__cls || !__sel) break;                                                                \
-        const char * __types = (TYPES);                                                             \
-        IMP            __imp = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+#define NP_CLASS_ADDMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                          \
+    do {                                                                                                    \
+        Class        __cls      = NULL;                                                                     \
+        SEL          __sel      = NULL;                                                                     \
+        const char * __types    = NULL;                                                                     \
+        IMP          __imp      = NULL;                                                                     \
+        bool         __success  = false;                                                                    \
+        __cls                   = (CLASS);                                                                  \
+        __sel                   = (SELECTOR);                                                               \
+        if (__cls && __sel) {                                                                               \
+            __types             = (TYPES);                                                                  \
+            __imp               = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
         
-#define NP_CLASS_ADDMETHOD_PROCESS                                                                  \
-        );                                                                                          \
-        __attribute__((unused)) bool __success = class_addMethod(__cls, __sel, __imp, __types);     
+#define NP_CLASS_ADDMETHOD_PROCESS                                                                          \
+                );                                                                                          \
+            __success           = class_addMethod(__cls, __sel, __imp, __types);                            \
+        }
 
-#define NP_CLASS_ADDMETHOD_END                                                                      \
+#define NP_CLASS_ADDMETHOD_END                                                                              \
     } while(false);
 
 /// class_replaceMethod
 ///
+#define NP_CLASS_REPLACEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                      \
+    do {                                                                                                    \
+        Class        __cls      = NULL;                                                                     \
+        SEL          __sel      = NULL;                                                                     \
+        const char * __types    = NULL;                                                                     \
+        Method       __method   = NULL;                                                                     \
+        IMP          __imp      = NULL;                                                                     \
+        IMP          __next_imp = NULL;                                                                     \
+        __cls                   = (CLASS);                                                                  \
+        __sel                   = (SELECTOR);                                                               \
+        if (__cls && __sel) {                                                                               \
+            __method            = NPClassGetOwnMethod(__cls, __sel);                                        \
+            if (__method) {                                                                                 \
+                __types             = (TYPES);                                                              \
+                if (!__types) {                                                                             \
+                    __types = method_getTypeEncoding(__method);                                             \
+                }                                                                                           \
+                __imp               = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+    
+#define NP_CLASS_REPLACEMETHOD_PROCESS                                                                      \
+                    );                                                                                      \
+                __next_imp          = class_replaceMethod(__cls, __sel, __imp, __types);                    \
+            }                                                                                               \
+        }
 
+#define NP_CLASS_REPLACEMETHOD_END                                                                          \
+    } while(false);
 
 #endif /* NP_OBJC_NSOBJCRUNTIME_H */

@@ -7,7 +7,7 @@
 
 #include <NPFoundation/dispatch/once.h>
 
-void NPDispatchOnce(dispatch_once_t *predicate, void(*func)(void)) {
+void NPDispatchOnce(dispatch_once_t * _Nullable predicate, void(* _Nullable func)(void)) {
     dispatch_once(predicate, ^{
         func();
     });
