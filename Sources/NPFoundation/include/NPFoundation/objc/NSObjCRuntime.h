@@ -39,13 +39,11 @@ NP_CEXTERN_END
 ///
 #define NP_CLASS_ADDMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                          \
     do {                                                                                                    \
-        Class        __cls      = NULL;                                                                     \
-        SEL          __sel      = NULL;                                                                     \
+        Class        __cls      = (CLASS);                                                                  \
+        SEL          __sel      = (SELECTOR);                                                               \
         const char * __types    = NULL;                                                                     \
         IMP          __imp      = NULL;                                                                     \
         bool         __success  = false;                                                                    \
-        __cls                   = (CLASS);                                                                  \
-        __sel                   = (SELECTOR);                                                               \
         if (__cls && __sel) {                                                                               \
             __types             = (TYPES);                                                                  \
             __imp               = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
@@ -62,26 +60,24 @@ NP_CEXTERN_END
 ///
 #define NP_CLASS_REPLACEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                      \
     do {                                                                                                    \
-        Class        __cls      = NULL;                                                                     \
-        SEL          __sel      = NULL;                                                                     \
+        Class        __cls      = (CLASS);                                                                  \
+        SEL          __sel      = (SELECTOR);                                                               \
         const char * __types    = NULL;                                                                     \
         Method       __method   = NULL;                                                                     \
         IMP          __imp      = NULL;                                                                     \
         IMP          __next_imp = NULL;                                                                     \
-        __cls                   = (CLASS);                                                                  \
-        __sel                   = (SELECTOR);                                                               \
         if (__cls && __sel) {                                                                               \
             __method            = NPClassGetOwnMethod(__cls, __sel);                                        \
             if (__method) {                                                                                 \
-                __types             = (TYPES);                                                              \
+                __types         = (TYPES);                                                                  \
                 if (!__types) {                                                                             \
                     __types = method_getTypeEncoding(__method);                                             \
                 }                                                                                           \
-                __imp               = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+                __imp           = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
     
 #define NP_CLASS_REPLACEMETHOD_PROCESS                                                                      \
                     );                                                                                      \
-                __next_imp          = class_replaceMethod(__cls, __sel, __imp, __types);                    \
+                __next_imp      = class_replaceMethod(__cls, __sel, __imp, __types);                        \
             }                                                                                               \
         }
 
