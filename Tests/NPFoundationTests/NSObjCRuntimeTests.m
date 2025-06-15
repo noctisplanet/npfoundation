@@ -8,6 +8,30 @@
 #import <XCTest/XCTest.h>
 #import <NPFoundation/NPFoundation.h>
 
+@interface NPObject : NSObject
+
+@end
+
+@interface SuperObject : NPObject
+
+@end
+
+@interface SubObject : SuperObject
+
+@end
+
+@implementation NPObject
+
+@end
+
+@implementation SuperObject
+
+@end
+
+@implementation SubObject
+
+@end
+
 @protocol NSObjCRuntimeTestsProtocol <NSObject>
 
 - (void)_testAddMethod1;
@@ -18,9 +42,17 @@
 
 @end
 
+
+
 @interface NSObjCRuntimeTests : XCTestCase
 
 @property (nonatomic, assign) double _testValue;
+
+@end
+
+@interface XCTestCase (OverrideMethod)
+
+- (void)_testOverrideMethod1;
 
 @end
 
@@ -44,16 +76,15 @@
 - (void)testAddMethod {
     NSObjCRuntimeTests *tests = self;
     id<NSObjCRuntimeTestsProtocol> prot = (id<NSObjCRuntimeTestsProtocol>)self;
-    
     NP_CLASS_ADDMETHOD_BEGIN(tests.class, @selector(_testAddMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
         tests._testValue = 10;
     }
     NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"success: %d", __success);
-        XCTAssertTrue(__success);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
     XCTAssertTrue(tests._testValue == 0);
@@ -64,11 +95,11 @@
         
     }
     NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"success: %d", __success);
-        XCTAssertFalse(__success);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertFalse(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
 
@@ -77,11 +108,11 @@
         return 3.14;
     }
     NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"success: %d", __success);
-        XCTAssertTrue(__success);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
     XCTAssertTrue([prot _testAddMethod2] == 3.14);
@@ -95,11 +126,11 @@
         return x + y +z;
     }
     NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"success: %d", __success);
-        XCTAssertTrue(__success);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
     XCTAssertTrue([prot _testAddMethod3:1 y:2 z:3] == 1 + 2 + 3);
@@ -108,41 +139,60 @@
 
 - (void)testReplaceMethod {
     NSObjCRuntimeTests *tests = self;
-    
     NP_CLASS_REPLACEMETHOD_BEGIN(tests.class, @selector(_testReplaceMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        NSLog(@"   func: %p", __next_imp);
+        NSLog(@"   func: %p", _np_next_imp);
         tests._testValue = 10;
     }
     NP_CLASS_REPLACEMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"   func: %p", __next_imp);
-        XCTAssertTrue(__next_imp);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"   func: %p", _np_next_imp);
+        XCTAssertTrue(_np_next_imp);
     }
     NP_CLASS_REPLACEMETHOD_END
     [tests _testReplaceMethod1];
     XCTAssertTrue(tests._testValue == 10);
     
     NP_CLASS_REPLACEMETHOD_BEGIN(tests.class, @selector(_test), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        
+        NP_METHOD_OVERLOAD(self, _np_sel);
     }
     NP_CLASS_REPLACEMETHOD_PROCESS {
-        NSLog(@"  class: %@", __cls);
-        NSLog(@"    sel: %s", sel_getName(__sel));
-        NSLog(@"  types: %s", __types);
-        NSLog(@"   func: %p", __next_imp);
-        XCTAssertFalse(__next_imp);
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"   func: %p", _np_next_imp);
+        XCTAssertFalse(_np_next_imp);
     }
     NP_CLASS_REPLACEMETHOD_END
 }
 
-//- (void)testPerformanceExample {
-//    // This is an example of a performance test case.
-//    [self measureBlock:^{
-//        // Put the code you want to measure the time of here.
-//    }];
-//}
+- (void)testOverrideMethod {
+    NSObjCRuntimeTests *tests = self;
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(tests.class, @selector(_testOverrideMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        NSLog(@"success: %d", _np_success);
+        tests._testValue = 10;
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    [tests _testOverrideMethod1];
+    XCTAssertTrue(tests._testValue == 10);
+    
+}
+
+@end
+
+@implementation XCTestCase (OverrideMethod)
+
+- (void)_testOverrideMethod1 {
+    
+}
 
 @end
 

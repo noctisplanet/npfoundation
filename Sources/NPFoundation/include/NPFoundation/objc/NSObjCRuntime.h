@@ -22,6 +22,7 @@ NP_CEXTERN_END
 
 // A >> A
 #define _NP_GUARD_(A) A
+
 // (id self, SEL name, ) >> (id self, )
 #define _NP_BLOCK_ARGS_(A1,A2,ARGS...) A1, ##ARGS
 // (id self, SEL name, ) >> (id self, SEL name, )
@@ -37,51 +38,91 @@ NP_CEXTERN_END
 
 /// class_addMethod
 ///
-#define NP_CLASS_ADDMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                          \
-    do {                                                                                                    \
-        Class        __cls      = (CLASS);                                                                  \
-        SEL          __sel      = (SELECTOR);                                                               \
-        const char * __types    = NULL;                                                                     \
-        IMP          __imp      = NULL;                                                                     \
-        bool         __success  = false;                                                                    \
-        if (__cls && __sel) {                                                                               \
-            __types             = (TYPES);                                                                  \
-            __imp               = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+#define NP_CLASS_ADDMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                                          \
+    do {                                                                                                                    \
+        Class        _np_cls     = (CLASS);                                                                                 \
+        SEL          _np_sel     = (SELECTOR);                                                                              \
+        const char * _np_types   = NULL;                                                                                    \
+        __block IMP  _np_imp     = NULL;                                                                                    \
+        __block bool _np_success = false;                                                                                   \
+        if (_np_cls && _np_sel) {                                                                                           \
+            _np_types            = (TYPES);                                                                                 \
+            _np_imp              = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
         
-#define NP_CLASS_ADDMETHOD_PROCESS                                                                          \
-                );                                                                                          \
-            __success           = class_addMethod(__cls, __sel, __imp, __types);                            \
+#define NP_CLASS_ADDMETHOD_PROCESS                                                                                          \
+                );                                                                                                          \
+            _np_success          = class_addMethod(_np_cls, _np_sel, _np_imp, _np_types);                                   \
         }
 
-#define NP_CLASS_ADDMETHOD_END                                                                              \
+#define NP_CLASS_ADDMETHOD_END                                                                                              \
     } while(false);
 
 /// class_replaceMethod
 ///
-#define NP_CLASS_REPLACEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                      \
-    do {                                                                                                    \
-        Class        __cls      = (CLASS);                                                                  \
-        SEL          __sel      = (SELECTOR);                                                               \
-        const char * __types    = NULL;                                                                     \
-        Method       __method   = NULL;                                                                     \
-        IMP          __imp      = NULL;                                                                     \
-        IMP          __next_imp = NULL;                                                                     \
-        if (__cls && __sel) {                                                                               \
-            __method            = NPClassGetOwnMethod(__cls, __sel);                                        \
-            if (__method) {                                                                                 \
-                __types         = (TYPES);                                                                  \
-                if (!__types) {                                                                             \
-                    __types = method_getTypeEncoding(__method);                                             \
-                }                                                                                           \
-                __imp           = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+#define NP_CLASS_REPLACEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                                      \
+    do {                                                                                                                    \
+        typedef __typeof(RETURN)(*_NP_NEXT_IMP)(_NP_FUNCTION_ARGS_(ARGS));                                                  \
+        Class                _np_cls      = (CLASS);                                                                        \
+        SEL                  _np_sel      = (SELECTOR);                                                                     \
+        const char *         _np_types    = NULL;                                                                           \
+        Method               _np_method   = NULL;                                                                           \
+        __block IMP          _np_imp      = NULL;                                                                           \
+        __block _NP_NEXT_IMP _np_next_imp = NULL;                                                                           \
+        if (_np_cls && _np_sel) {                                                                                           \
+            _np_method                    = NPClassGetOwnMethod(_np_cls, _np_sel);                                          \
+            if (_np_method) {                                                                                               \
+                _np_types                 = (TYPES);                                                                        \
+                if (!_np_types) {                                                                                           \
+                    _np_types             = method_getTypeEncoding(_np_method);                                             \
+                }                                                                                                           \
+                _np_imp                   = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
     
-#define NP_CLASS_REPLACEMETHOD_PROCESS                                                                      \
-                    );                                                                                      \
-                __next_imp      = class_replaceMethod(__cls, __sel, __imp, __types);                        \
-            }                                                                                               \
+#define NP_CLASS_REPLACEMETHOD_PROCESS                                                                                      \
+                    );                                                                                                      \
+                _np_next_imp              = (_NP_NEXT_IMP)class_replaceMethod(_np_cls, _np_sel, _np_imp, _np_types);        \
+            }                                                                                                               \
         }
 
-#define NP_CLASS_REPLACEMETHOD_END                                                                          \
+#define NP_CLASS_REPLACEMETHOD_END                                                                                          \
     } while(false);
+
+#define NP_METHOD_OVERLOAD(ARGS...)                                                                                         \
+    _np_next_imp(ARGS);
+
+/// class_addMethod(override)
+///
+#define NP_CLASS_OVERRIDEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                                     \
+    do {                                                                                                                    \
+        typedef __typeof(RETURN)(*_NP_OBJC_MSGSENDSUPER)(_NP_OBJCSUPER_ARGS_(ARGS));                                        \
+        Class                 _np_cls               = (CLASS);                                                              \
+        SEL                   _np_sel               = (SELECTOR);                                                           \
+        const char *          _np_types             = NULL;                                                                 \
+        Method                _np_super_method      = NULL;                                                                 \
+        __block IMP           _np_imp               = NULL;                                                                 \
+        __block bool          _np_success           = false;                                                                \
+        _NP_OBJC_MSGSENDSUPER _np_objc_msgsendsuper = (_NP_OBJC_MSGSENDSUPER)objc_msgSendSuper;                             \
+        if (_np_cls && _np_sel) {                                                                                           \
+            _np_super_method                        = NPClassGetSuperMethod(_np_cls, _np_sel);                              \
+            if (_np_super_method) {                                                                                         \
+                _np_types                           = (TYPES);                                                              \
+                if (!_np_types) {                                                                                           \
+                    _np_types                       = method_getTypeEncoding(_np_super_method);                             \
+                }                                                                                                           \
+                _np_imp                             = imp_implementationWithBlock(^__typeof(RETURN)(_NP_BLOCK_ARGS_(ARGS))
+    
+#define NP_CLASS_OVERRIDEMETHOD_PROCESS                                                                                     \
+                    );                                                                                                      \
+                _np_success                         = class_addMethod(_np_cls, _np_sel, _np_imp, _np_types);                \
+            }                                                                                                               \
+        }
+
+#define NP_CLASS_OVERRIDEMETHOD_END                                                                                         \
+    } while(false);
+
+#define NP_MAKE_OBJC_SUPER(ID)                                                                                              \
+    struct objc_super _np_objc_super                = { (ID), class_getSuperclass(_np_cls) };                               \
+
+#define NP_METHOD_OVERRIDE(ARGS...)                                                                                         \
+    _np_objc_msgsendsuper(&_np_objc_super, ARGS);
 
 #endif /* NP_OBJC_NSOBJCRUNTIME_H */
