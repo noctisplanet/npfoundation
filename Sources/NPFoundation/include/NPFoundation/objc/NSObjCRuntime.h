@@ -87,7 +87,7 @@ NP_CEXTERN_END
     } while(false);
 
 #define NP_METHOD_OVERLOAD(ARGS...)                                                                                         \
-    _np_next_imp(ARGS);
+    _np_next_imp(ARGS)
 
 /// class_addMethod(override)
 ///
@@ -123,6 +123,6 @@ NP_CEXTERN_END
     struct objc_super _np_objc_super                = { (ID), class_getSuperclass(_np_cls) };                               \
 
 #define NP_METHOD_OVERRIDE(ARGS...)                                                                                         \
-    _np_objc_msgsendsuper(&_np_objc_super, ARGS);
+    _np_objc_msgsendsuper(&_np_objc_super, ARGS)
 
 #endif /* NP_OBJC_NSOBJCRUNTIME_H */

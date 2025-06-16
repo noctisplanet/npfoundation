@@ -31,5 +31,4 @@ Method _Nullable NPClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name) {
     if (super == cls)
         return NULL;
     return class_getInstanceMethod(super, name);
-    return NULL;
 }

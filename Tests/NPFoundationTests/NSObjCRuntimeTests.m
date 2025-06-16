@@ -8,64 +8,86 @@
 #import <XCTest/XCTest.h>
 #import <NPFoundation/NPFoundation.h>
 
+@protocol NPObjectProtocol <NSObject>
+
+- (void)addMethod;
+
+- (NSString *)addMethod:(NSString *)newValue;
+
+- (int64_t)addMethodSum:(int64_t)x y:(int64_t)y z:(int64_t)z;
+
+@end
+
 @interface NPObject : NSObject
 
-@end
-
-@interface SuperObject : NPObject
+@property (nonatomic, strong) NSString *npObject;
 
 @end
 
-@interface SubObject : SuperObject
+@interface NPSuperObject : NPObject
+
+@property (nonatomic, strong) NSString *superObject;
+
+@end
+
+@interface NPSubObject : NPSuperObject
+
+@property (nonatomic, strong) NSString *subObject;
 
 @end
 
 @implementation NPObject
 
-@end
+- (void)overrideNPObjectMethod {
+    self.npObject = @"NPObjectMethod";
+}
 
-@implementation SuperObject
+- (NSString *)overrideMethod:(NSString *)newValue {
+    return newValue;
+}
 
-@end
-
-@implementation SubObject
-
-@end
-
-@protocol NSObjCRuntimeTestsProtocol <NSObject>
-
-- (void)_testAddMethod1;
-
-- (double)_testAddMethod2;
-
-- (int64_t)_testAddMethod3:(int64_t)x y:(int64_t)y z:(int64_t)z;
+- (int64_t)overrideMethodSum:(int64_t)x y:(int64_t)y z:(int64_t)z {
+    return x + y + z;
+}
 
 @end
 
+@implementation NPSuperObject
 
+- (void)replaceMethod {
+    self.superObject = @"NPSuperObject";
+}
+
+- (NSString *)replaceMethod:(NSString *)newValue {
+    return newValue;
+}
+
+- (int64_t)replaceMethodSum:(int64_t)x y:(int64_t)y z:(int64_t)z {
+    return x + y + z;
+}
+
+- (void)overrideNPSuperObject {
+    self.superObject = @"NPSuperObject";
+}
+
+@end
+
+@implementation NPSubObject
+
+- (void)overrideNPSubObject {
+    self.subObject = @"NPNPSubObject";
+}
+
+@end
 
 @interface NSObjCRuntimeTests : XCTestCase
-
-@property (nonatomic, assign) double _testValue;
-
-@end
-
-@interface XCTestCase (OverrideMethod)
-
-- (void)_testOverrideMethod1;
-
-@end
-
-@interface NSObjCRuntimeTests (ReplaceMethod)
-
-- (void)_testReplaceMethod1;
 
 @end
 
 @implementation NSObjCRuntimeTests
 
 - (void)setUp {
-    self._testValue = 0;
+    
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
@@ -73,11 +95,172 @@
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
+- (void)testOverrideMethod {
+    __block NSString *value = nil;
+    NPSubObject *objc = [NPSubObject new];
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPObjectMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        value = @"TestValue";
+        NP_MAKE_OBJC_SUPER(self);
+        NP_METHOD_OVERRIDE(_np_sel);
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"  method: %p", _np_super_method);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    [objc overrideNPObjectMethod];
+    XCTAssertEqual(@"TestValue", value);
+    XCTAssertEqual(@"NPObjectMethod", objc.npObject);
+    
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPSuperObject), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        value = @"TestValue:";
+        NP_MAKE_OBJC_SUPER(self);
+        NP_METHOD_OVERRIDE(_np_sel);
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"  method: %p", _np_super_method);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    [objc overrideNPSuperObject];
+    XCTAssertEqual(@"TestValue:", value);
+    XCTAssertEqual(@"NPSuperObject", objc.superObject);
+    
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+        NP_MAKE_OBJC_SUPER(self);
+        XCTAssertEqual(newValue, NP_METHOD_OVERRIDE(_np_sel, newValue));
+        value = @"TestValue:NewValue";
+        return @"ReturnValue";
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"  method: %p", _np_super_method);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    XCTAssertEqual(@"ReturnValue", [objc overrideMethod:@"NewValue"]);
+    XCTAssertEqual(@"TestValue:NewValue", value);
+    
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+        NP_MAKE_OBJC_SUPER(self);
+        XCTAssertEqual(x + y + z, NP_METHOD_OVERRIDE(_np_sel, x, y, z));
+        value = @"TestValue:Sum";
+        return x + y + z + 2;
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"  method: %p", _np_super_method);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    
+    XCTAssertEqual(20 + 21 + 22 + 2, [objc overrideMethodSum:20 y:21 z:22]);
+    XCTAssertEqual(@"TestValue:Sum", value);
+    
+    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPSubObject), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        NP_MAKE_OBJC_SUPER(self);
+        NP_METHOD_OVERRIDE(_np_sel);
+    }
+    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"  method: %p", _np_super_method);
+        XCTAssertFalse(_np_types);
+        XCTAssertFalse(_np_super_method);
+    }
+    NP_CLASS_OVERRIDEMETHOD_END
+    [objc overrideNPSubObject];
+    XCTAssertEqual(@"NPNPSubObject", objc.subObject);
+}
+
+- (void)testReplaceMethod {
+    __block NSString *value = nil;
+    NPSuperObject *obj = [NPSuperObject new];
+    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        value = @"TestValue";
+        NP_METHOD_OVERLOAD(self, _np_sel);
+    }
+    NP_CLASS_REPLACEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"NEXT_IMP: %p", _np_next_imp);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_next_imp);
+    }
+    NP_CLASS_REPLACEMETHOD_END
+    [obj replaceMethod];
+    XCTAssertEqual(@"TestValue", value);
+    XCTAssertEqual(@"NPSuperObject", obj.superObject);
+    
+    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+        value = @"TestValue:";
+        XCTAssertEqual(newValue, NP_METHOD_OVERLOAD(self, _np_sel, newValue));
+        return @"ReturnValue";
+    }
+    NP_CLASS_REPLACEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"NEXT_IMP: %p", _np_next_imp);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_next_imp);
+    }
+    NP_CLASS_REPLACEMETHOD_END
+    XCTAssertEqual(@"ReturnValue", [obj replaceMethod:@"argValue"]);
+    XCTAssertEqual(@"TestValue:", value);
+    
+    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+        value = @"replaceMethodSum:y:z:";
+        XCTAssertEqual(x + y + z, NP_METHOD_OVERLOAD(self, _np_sel, x, y, z));
+        return x + y + z + 1;
+    }
+    NP_CLASS_REPLACEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"NEXT_IMP: %p", _np_next_imp);
+        XCTAssertTrue(_np_types);
+        XCTAssertTrue(_np_next_imp);
+    }
+    NP_CLASS_REPLACEMETHOD_END
+    XCTAssertEqual(10 + 11 + 12 + 1, [obj replaceMethodSum:10 y:11 z:12]);
+    XCTAssertEqual(@"replaceMethodSum:y:z:", value);
+    
+    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(setNpObject:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+        return NP_METHOD_OVERLOAD(self, _np_sel, newValue);
+    }
+    NP_CLASS_REPLACEMETHOD_PROCESS {
+        NSLog(@"   class: %@", _np_cls);
+        NSLog(@"     sel: %s", sel_getName(_np_sel));
+        NSLog(@"   types: %s", _np_types);
+        NSLog(@"NEXT_IMP: %p", _np_next_imp);
+        XCTAssertFalse(_np_types);
+        XCTAssertFalse(_np_next_imp);
+    }
+    NP_CLASS_REPLACEMETHOD_END
+}
+
 - (void)testAddMethod {
-    NSObjCRuntimeTests *tests = self;
-    id<NSObjCRuntimeTestsProtocol> prot = (id<NSObjCRuntimeTestsProtocol>)self;
-    NP_CLASS_ADDMETHOD_BEGIN(tests.class, @selector(_testAddMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        tests._testValue = 10;
+    __block NSString *value = nil;
+    NPObject *obj = [NPObject new];
+    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+        value = @"TestValue";
     }
     NP_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
@@ -87,11 +270,55 @@
         XCTAssertTrue(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
-    XCTAssertTrue(tests._testValue == 0);
-    [prot _testAddMethod1];
-    XCTAssertTrue(tests._testValue == 10);
+    XCTAssertNil(value);
+    [(id<NPObjectProtocol>)obj addMethod];
+    XCTAssertEqual(@"TestValue", value);
     
-    NP_CLASS_ADDMETHOD_BEGIN(tests.class, @selector(_testAddMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+        value = newValue;
+        return @"ReturnTestValue";
+    }
+    NP_CLASS_ADDMETHOD_PROCESS {
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_success);
+    }
+    NP_CLASS_ADDMETHOD_END
+    NSString *returnValue = [(id<NPObjectProtocol>)obj addMethod:@"argValue"];
+    XCTAssertEqual(@"ReturnTestValue", returnValue);
+    XCTAssertEqual(@"argValue", value);
+    
+    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+        value = @"addMethodSum:y:z:";
+        return x + y + z;
+    }
+    NP_CLASS_ADDMETHOD_PROCESS {
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertTrue(_np_success);
+    }
+    NP_CLASS_ADDMETHOD_END
+    int64_t sum = [(id<NPObjectProtocol>)obj addMethodSum:1 y:2 z:3];
+    XCTAssertEqual(1 + 2 + 3, sum);
+    XCTAssertEqual(@"addMethodSum:y:z:", value);
+    
+    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(npObject), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name)) {
+        return @"";
+    }
+    NP_CLASS_ADDMETHOD_PROCESS {
+        NSLog(@"  class: %@", _np_cls);
+        NSLog(@"    sel: %s", sel_getName(_np_sel));
+        NSLog(@"  types: %s", _np_types);
+        NSLog(@"success: %d", _np_success);
+        XCTAssertFalse(_np_success);
+    }
+    NP_CLASS_ADDMETHOD_END
+    
+    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(setNpObject:), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name, NSString *newValue)) {
         
     }
     NP_CLASS_ADDMETHOD_PROCESS {
@@ -102,104 +329,6 @@
         XCTAssertFalse(_np_success);
     }
     NP_CLASS_ADDMETHOD_END
-
-    NP_CLASS_ADDMETHOD_BEGIN(tests.class, @selector(_testAddMethod2), NULL, NP_RETURN(double), NP_ARGS(id self, SEL name)) {
-        tests._testValue = 20;
-        return 3.14;
-    }
-    NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", _np_cls);
-        NSLog(@"    sel: %s", sel_getName(_np_sel));
-        NSLog(@"  types: %s", _np_types);
-        NSLog(@"success: %d", _np_success);
-        XCTAssertTrue(_np_success);
-    }
-    NP_CLASS_ADDMETHOD_END
-    XCTAssertTrue([prot _testAddMethod2] == 3.14);
-    XCTAssertTrue(tests._testValue == 20);
-    
-    NP_CLASS_ADDMETHOD_BEGIN(tests.class, @selector(_testAddMethod3:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
-        tests._testValue = x + y + z;
-        XCTAssertTrue(x == 1);
-        XCTAssertTrue(y == 2);
-        XCTAssertTrue(z == 3);
-        return x + y +z;
-    }
-    NP_CLASS_ADDMETHOD_PROCESS {
-        NSLog(@"  class: %@", _np_cls);
-        NSLog(@"    sel: %s", sel_getName(_np_sel));
-        NSLog(@"  types: %s", _np_types);
-        NSLog(@"success: %d", _np_success);
-        XCTAssertTrue(_np_success);
-    }
-    NP_CLASS_ADDMETHOD_END
-    XCTAssertTrue([prot _testAddMethod3:1 y:2 z:3] == 1 + 2 + 3);
-    XCTAssertTrue(tests._testValue == 1 + 2 + 3);
-}
-
-- (void)testReplaceMethod {
-    NSObjCRuntimeTests *tests = self;
-    NP_CLASS_REPLACEMETHOD_BEGIN(tests.class, @selector(_testReplaceMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        NSLog(@"   func: %p", _np_next_imp);
-        tests._testValue = 10;
-    }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
-        NSLog(@"  class: %@", _np_cls);
-        NSLog(@"    sel: %s", sel_getName(_np_sel));
-        NSLog(@"  types: %s", _np_types);
-        NSLog(@"   func: %p", _np_next_imp);
-        XCTAssertTrue(_np_next_imp);
-    }
-    NP_CLASS_REPLACEMETHOD_END
-    [tests _testReplaceMethod1];
-    XCTAssertTrue(tests._testValue == 10);
-    
-    NP_CLASS_REPLACEMETHOD_BEGIN(tests.class, @selector(_test), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        NP_METHOD_OVERLOAD(self, _np_sel);
-    }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
-        NSLog(@"  class: %@", _np_cls);
-        NSLog(@"    sel: %s", sel_getName(_np_sel));
-        NSLog(@"  types: %s", _np_types);
-        NSLog(@"   func: %p", _np_next_imp);
-        XCTAssertFalse(_np_next_imp);
-    }
-    NP_CLASS_REPLACEMETHOD_END
-}
-
-- (void)testOverrideMethod {
-    NSObjCRuntimeTests *tests = self;
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(tests.class, @selector(_testOverrideMethod1), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        NSLog(@"success: %d", _np_success);
-        tests._testValue = 10;
-    }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
-        NSLog(@"  class: %@", _np_cls);
-        NSLog(@"    sel: %s", sel_getName(_np_sel));
-        NSLog(@"  types: %s", _np_types);
-        NSLog(@"success: %d", _np_success);
-        XCTAssertTrue(_np_super_method);
-    }
-    NP_CLASS_OVERRIDEMETHOD_END
-    [tests _testOverrideMethod1];
-    XCTAssertTrue(tests._testValue == 10);
-    
-}
-
-@end
-
-@implementation XCTestCase (OverrideMethod)
-
-- (void)_testOverrideMethod1 {
-    
-}
-
-@end
-
-@implementation NSObjCRuntimeTests (ReplaceMethod)
-
-- (void)_testReplaceMethod1 {
-    self._testValue = 1;
 }
 
 @end
