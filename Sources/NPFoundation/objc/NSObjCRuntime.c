@@ -5,7 +5,7 @@
 //  Created by Jonathan Lee on 5/6/25.
 //
 
-#include <NPFoundation/objc/NSObjCRuntime.h>
+#include <NPFoundation/objc.h>
 
 Method _Nullable NPClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name) {
     unsigned int outCount = 0;
