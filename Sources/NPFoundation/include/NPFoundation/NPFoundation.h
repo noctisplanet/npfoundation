@@ -6,4 +6,5 @@
 //
 
 #include <NPFoundation/Definitions.h>
+#include <NPFoundation/Diagnostics.h>
 #include <NPFoundation/objc.h>
