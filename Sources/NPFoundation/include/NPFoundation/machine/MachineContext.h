@@ -28,16 +28,28 @@
 
 #include <NPFoundation/Definitions.h>
 #include <sys/ucontext.h>
+#include <stdbool.h>
+#include <pthread.h>
 
 NP_CEXTERN_BEGIN
 
 struct NPMachineContext {
-#ifdef __arm64__
-    _STRUCT_MCONTEXT64 data;
-#else
+//#ifdef __arm64__
+//    _STRUCT_MCONTEXT64 data;
+//#else
     _STRUCT_MCONTEXT data;
-#endif
+//#endif
 };
+
+NP_EXTERN bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread);
+
+NP_EXTERN uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const context);
+
+NP_EXTERN uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const context);
+
+NP_EXTERN uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *const context);
+
+NP_EXTERN uintptr_t NPMachineContextGetLinkRegister(const struct NPMachineContext *const context);
 
 NP_CEXTERN_END
 

@@ -24,4 +24,93 @@
 //
 
 #include <NPFoundation/machine.h>
+#include <mach/mach_types.h>
+#include <mach/mach_error.h>
+#include <mach/thread_act.h>
 
+#if NP_DESTINATION_IOS || NP_DESTINATION_TVOS || NP_DESTINATION_MACOS || NP_DESTINATION_XROS
+static bool setState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t number) {
+    mach_msg_type_number_t cnt = number;
+    kern_return_t kr = thread_get_state(thread, flavor, state, &cnt);
+    if (kr == KERN_SUCCESS) {
+        return true;
+    } else {
+        return false;
+    }
+}
+#else
+NP_STATIC_INLINE bool fillState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t stateCount) {
+    return false;
+}
+#endif
+
+bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread) {
+    if (!context) {
+        return false;
+    }
+    const thread_t machThread = pthread_mach_thread_np(thread);
+    if (machThread == MACH_PORT_NULL) {
+        return false;
+    }
+#if defined(__arm__)
+    return setState(machThread, (thread_state_t)&context->data.__ss, ARM_THREAD_STATE, ARM_THREAD_STATE_COUNT) &&
+        setState(machThread, (thread_state_t)&context->data.__es, ARM_EXCEPTION_STATE, ARM_EXCEPTION_STATE_COUNT);
+#elif defined(__arm64__)
+    return setState(machThread, (thread_state_t)&context->data.__ss, ARM_THREAD_STATE64, ARM_THREAD_STATE64_COUNT) &&
+        setState(machThread, (thread_state_t)&context->data.__es, ARM_EXCEPTION_STATE64, ARM_EXCEPTION_STATE64_COUNT);
+#elif defined(__i386__)
+    return setState(machThread, (thread_state_t)&context->data.__ss, x86_THREAD_STATE32, x86_THREAD_STATE32_COUNT) &&
+        setState(machThread, (thread_state_t)&context->data.__es, x86_EXCEPTION_STATE32, x86_EXCEPTION_STATE32_COUNT);
+#elif defined(__x86_64__)
+    return setState(machThread, (thread_state_t)&context->data.__ss, x86_THREAD_STATE64, x86_THREAD_STATE64_COUNT) &&
+        setState(machThread, (thread_state_t)&context->data.__es, x86_EXCEPTION_STATE64, x86_EXCEPTION_STATE64_COUNT);
+#endif
+}
+
+uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const context) {
+#if defined(__arm__)
+    return context->data.__ss.__r[7];
+#elif defined(__arm64__)
+    return context->data.__ss.__fp;
+#elif defined(__i386__)
+    return context->data.__ss.__ebp;
+#elif defined(__x86_64__)
+    return context->data.__ss.__rbp;
+#endif
+}
+
+uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const context) {
+#if defined(__arm__)
+    return context->data.__ss.__sp;
+#elif defined(__arm64__)
+    return context->data.__ss.__sp;
+#elif defined(__i386__)
+    return context->data.__ss.__esp;
+#elif defined(__x86_64__)
+    return context->data.__ss.__rsp;
+#endif
+}
+
+uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *const context) {
+#if defined(__arm__)
+    return context->data.__ss.__pc;
+#elif defined(__arm64__)
+    return context->data.__ss.__pc;
+#elif defined(__i386__)
+    return context->data.__ss.__eip;
+#elif defined(__x86_64__)
+    return context->data.__ss.__rip;
+#endif
+}
+
+uintptr_t NPMachineContextGetLinkRegister(const struct NPMachineContext *const context) {
+#if defined(__arm__)
+    return context->data.__ss.__lr;
+#elif defined(__arm64__)
+    return context->data.__ss.__lr;
+#elif defined(__i386__)
+    return 0;
+#elif defined(__x86_64__)
+    return 0;
+#endif
+}

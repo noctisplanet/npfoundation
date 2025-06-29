@@ -26,6 +26,6 @@
 #include <Foundation/Foundation.h>
 #include <NPFoundation/NPFoundation.h>
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char * argv[]) {    
     return 0;
 }
