@@ -23,8 +23,28 @@
 //  SOFTWARE.
 //
 
-#include <TargetConditionals.h>
+#ifdef __APPLE__
 #include <Availability.h>
+#include <TargetConditionals.h>
+#define NP_PLATFORM_APPLE 1
+#endif
+
+#if defined(TARGET_OS_VISION) && TARGET_OS_VISION
+#define NP_DESTINATION_XROS 1
+#else
+#define NP_DESTINATION_XROS 0
+#endif
+
+#define NP_DESTINATION_IOS     (NP_PLATFORM_APPLE && TARGET_OS_IOS  )
+#define NP_DESTINATION_TVOS    (NP_PLATFORM_APPLE && TARGET_OS_TV   )
+#define NP_DESTINATION_WATCHOS (NP_PLATFORM_APPLE && TARGET_OS_WATCH)
+#define NP_DESTINATION_MACOS   (NP_PLATFORM_APPLE && TARGET_OS_MAC && !(TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH || NP_DESTINATION_XROS))
+
+#if NP_DESTINATION_IOS || NP_DESTINATION_TVOS || NP_DESTINATION_WATCHOS || NP_DESTINATION_XROS
+#define NP_HAS_UIKIT 1
+#else
+#define NP_HAS_UIKIT 0
+#endif
 
 #if defined(__cplusplus)
 #define NP_EXTERN extern "C"

@@ -1,8 +1,8 @@
 //
-//  sys.h
+//  MachineContext.c
 //  npfoundation
 //
-//  Created by Jonathan Lee on 6/22/25.
+//  Created by Jonathan Lee on 6/27/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,5 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_SYS_H
-#define NP_SYS_H
+#include <NPFoundation/machine.h>
 
-
-
-#endif /* NP_SYS_H */

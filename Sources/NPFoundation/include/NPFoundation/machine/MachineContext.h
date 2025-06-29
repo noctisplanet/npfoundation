@@ -1,8 +1,8 @@
 //
-//  NPFoundation.h
+//  MachineContext.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 5/6/25.
+//  Created by Jonathan Lee on 6/27/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,22 @@
 //  SOFTWARE.
 //
 
+#ifndef NP_MACHINE_CONTEXT_H
+#define NP_MACHINE_CONTEXT_H
+
 #include <NPFoundation/Definitions.h>
-#include <NPFoundation/Diagnostics.h>
-#include <NPFoundation/machine.h>
-#include <NPFoundation/objc.h>
+#include <sys/ucontext.h>
+
+NP_CEXTERN_BEGIN
+
+struct NPMachineContext {
+#ifdef __arm64__
+    _STRUCT_MCONTEXT64 data;
+#else
+    _STRUCT_MCONTEXT data;
+#endif
+};
+
+NP_CEXTERN_END
+
+#endif /* NP_MACHINE_CONTEXT_H */
