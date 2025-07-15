@@ -1,8 +1,8 @@
 //
-//  NPFoundation.h
+//  timer.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 5/6/25.
+//  Created by Jonathan Lee on 7/13/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,38 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/Definitions.h>
-#include <NPFoundation/Diagnostics.h>
 #include <NPFoundation/dispatch.h>
-#include <NPFoundation/machine.h>
-#include <NPFoundation/objc.h>
+
+dispatch_source_t NPDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block) {
+    if (queue == NULL) {
+        queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
+    }
+    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, interval * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
+    dispatch_source_set_event_handler(timer, block);
+    return timer;
+}
+
+dispatch_source_t NPDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block) {
+    dispatch_source_t timer = NPDispatchTimerCreate(queue, interval, block);
+    dispatch_activate(timer);
+    return timer;
+}
+
+void NPDispatchTimerResume(dispatch_source_t timer) {
+    if (timer) {
+        dispatch_resume(timer);
+    }
+}
+
+void NPDispatchTimerSuspend(dispatch_source_t timer) {
+    if (timer) {
+        dispatch_suspend(timer);
+    }
+}
+
+void NPDispatchTimerCancel(dispatch_source_t timer) {
+    if (timer) {
+        dispatch_source_cancel(timer);
+    }
+}

@@ -1,8 +1,8 @@
 //
-//  NPFoundation.h
+//  dispatch.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 5/6/25.
+//  Created by Jonathan Lee on 7/13/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,13 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/Definitions.h>
-#include <NPFoundation/Diagnostics.h>
-#include <NPFoundation/dispatch.h>
-#include <NPFoundation/machine.h>
-#include <NPFoundation/objc.h>
+#ifndef NP_DISPATCH_H
+#define NP_DISPATCH_H
+
+#if __has_include(<NPFoundation/timer.h>)
+#include <NPFoundation/timer.h>
+#else
+#include <NPFoundation/dispatch/timer.h>
+#endif
+
+#endif /* NP_DISPATCH_H */
