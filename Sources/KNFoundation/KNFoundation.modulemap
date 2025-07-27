@@ -1,0 +1,6 @@
+framework module KNFoundation {
+    umbrella header "KNFoundation.h"
+    
+    export *
+    module * { export * }
+}

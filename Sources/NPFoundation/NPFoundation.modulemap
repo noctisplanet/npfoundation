@@ -1,6 +1,0 @@
-framework module NPFoundation {
-    umbrella header "NPFoundation.h"
-    
-    export *
-    module * { export * }
-}

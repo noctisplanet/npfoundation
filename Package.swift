@@ -8,28 +8,28 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "NPFoundation",
+            name: "KNFoundation",
             targets: [
-                "NPFoundation"
+                "KNFoundation"
             ]),
         .executable(
-            name: "NPFoundationExamples",
+            name: "KNFoundationExamples",
             targets: [
-                "NPFoundationExamples"
+                "KNFoundationExamples"
             ])
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "NPFoundation"),
+            name: "KNFoundation"),
         
         .testTarget(
-            name: "NPFoundationTests",
-            dependencies: ["NPFoundation"]),
+            name: "KNFoundationTests",
+            dependencies: ["KNFoundation"]),
         
         .executableTarget(
-            name: "NPFoundationExamples",
-            dependencies: ["NPFoundation"]),
+            name: "KNFoundationExamples",
+            dependencies: ["KNFoundation"]),
     ]
 )

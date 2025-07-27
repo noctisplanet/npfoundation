@@ -23,38 +23,26 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/dispatch.h>
+#ifndef KN_DISPATCH_TIMER_H
+#define KN_DISPATCH_TIMER_H
+#ifdef __BLOCKS__
 
-dispatch_source_t NPDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    if (queue == NULL) {
-        queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
-    }
-    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, interval * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
-    dispatch_source_set_event_handler(timer, block);
-    return timer;
-}
+#include <KNFoundation/Definitions.h>
+#include <dispatch/dispatch.h>
 
-dispatch_source_t NPDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    dispatch_source_t timer = NPDispatchTimerCreate(queue, interval, block);
-    dispatch_activate(timer);
-    return timer;
-}
+KN_CEXTERN_BEGIN
 
-void NPDispatchTimerResume(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_resume(timer);
-    }
-}
+KN_EXTERN dispatch_source_t KNDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block);
 
-void NPDispatchTimerSuspend(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_suspend(timer);
-    }
-}
+KN_EXTERN dispatch_source_t KNDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block);
 
-void NPDispatchTimerCancel(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_source_cancel(timer);
-    }
-}
+KN_EXTERN void KNDispatchTimerResume(dispatch_source_t timer);
+
+KN_EXTERN void KNDispatchTimerSuspend(dispatch_source_t timer);
+
+KN_EXTERN void KNDispatchTimerCancel(dispatch_source_t timer);
+
+KN_CEXTERN_END
+
+#endif /* __BLOCKS__ */
+#endif /* KN_DISPATCH_TIMER_H */

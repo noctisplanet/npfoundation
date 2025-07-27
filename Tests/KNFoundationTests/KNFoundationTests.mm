@@ -1,8 +1,8 @@
 //
-//  machine.h
+//  KNFoundationTests.mm
 //  npfoundation
 //
-//  Created by Jonathan Lee on 6/27/25.
+//  Created by Jonathan Lee on 5/6/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,33 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_MACHINE_H
-#define NP_MACHINE_H
+#import <XCTest/XCTest.h>
+#import <KNFoundation/KNFoundation.h>
 
-#if __has_include(<NPFoundation/MachineContext.h>)
-#include <NPFoundation/MachineContext.h>
-#else
-#include <NPFoundation/machine/MachineContext.h>
-#endif
+@interface KNFoundationTests : XCTestCase
 
-#endif /* NP_MACHINE_H */
+@end
+
+@implementation KNFoundationTests
+
+- (void)setUp {
+    // Put setup code here. This method is called before the invocation of each test method in the class.
+}
+
+- (void)tearDown {
+    // Put teardown code here. This method is called after the invocation of each test method in the class.
+}
+
+- (void)testExample {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+}
+
+- (void)testPerformanceExample {
+    // This is an example of a performance test case.
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+    }];
+}
+
+@end

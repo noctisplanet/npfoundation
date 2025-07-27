@@ -26,45 +26,45 @@
 #ifdef __APPLE__
 #include <Availability.h>
 #include <TargetConditionals.h>
-#define NP_PLATFORM_APPLE 1
+#define KN_PLATFORM_APPLE 1
 #endif
 
 #if defined(TARGET_OS_VISION) && TARGET_OS_VISION
-#define NP_DESTINATION_XROS 1
+#define KN_DESTINATION_XROS 1
 #else
-#define NP_DESTINATION_XROS 0
+#define KN_DESTINATION_XROS 0
 #endif
 
-#define NP_DESTINATION_IOS     (NP_PLATFORM_APPLE && TARGET_OS_IOS  )
-#define NP_DESTINATION_TVOS    (NP_PLATFORM_APPLE && TARGET_OS_TV   )
-#define NP_DESTINATION_WATCHOS (NP_PLATFORM_APPLE && TARGET_OS_WATCH)
-#define NP_DESTINATION_MACOS   (NP_PLATFORM_APPLE && TARGET_OS_MAC && !(TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH || NP_DESTINATION_XROS))
+#define KN_DESTINATION_IOS     (KN_PLATFORM_APPLE && TARGET_OS_IOS  )
+#define KN_DESTINATION_TVOS    (KN_PLATFORM_APPLE && TARGET_OS_TV   )
+#define KN_DESTINATION_WATCHOS (KN_PLATFORM_APPLE && TARGET_OS_WATCH)
+#define KN_DESTINATION_MACOS   (KN_PLATFORM_APPLE && TARGET_OS_MAC && !(TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH || KN_DESTINATION_XROS))
 
-#if NP_DESTINATION_IOS || NP_DESTINATION_TVOS || NP_DESTINATION_WATCHOS || NP_DESTINATION_XROS
-#define NP_HAS_UIKIT 1
+#if KN_DESTINATION_IOS || KN_DESTINATION_TVOS || KN_DESTINATION_WATCHOS || KN_DESTINATION_XROS
+#define KN_HAS_UIKIT 1
 #else
-#define NP_HAS_UIKIT 0
+#define KN_HAS_UIKIT 0
 #endif
 
 #if defined(__cplusplus)
-#define NP_EXTERN extern "C"
+#define KN_EXTERN extern "C"
 #else
-#define NP_EXTERN extern
+#define KN_EXTERN extern
 #endif
 
-#define NP_EXPORT NP_EXTERN
-#define NP_IMPORT NP_EXTERN
+#define KN_EXPORT KN_EXTERN
+#define KN_IMPORT KN_EXTERN
 
-#define NP_STATIC_INLINE static __inline__
-#define NP_EXTERN_INLINE extern __inline__
+#define KN_STATIC_INLINE static __inline__
+#define KN_EXTERN_INLINE extern __inline__
 
 #if defined(__cplusplus)
-#define NP_CEXTERN_BEGIN extern "C" {
-#define NP_CEXTERN_END }
+#define KN_CEXTERN_BEGIN extern "C" {
+#define KN_CEXTERN_END }
 #else
-#define NP_CEXTERN_BEGIN
-#define NP_CEXTERN_END
+#define KN_CEXTERN_BEGIN
+#define KN_CEXTERN_END
 #endif
 
-#define NP_NAMESPACE_BEGIN(NAME) namespace NAME {
-#define NP_NAMESPACE_END }
+#define KN_NAMESPACE_BEGIN(NAME) namespace NAME {
+#define KN_NAMESPACE_END }

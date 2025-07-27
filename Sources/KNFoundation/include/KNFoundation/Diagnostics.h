@@ -23,17 +23,17 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_DIAGNOSTICS_H
-#define NP_DIAGNOSTICS_H
+#ifndef KN_DIAGNOSTICS_H
+#define KN_DIAGNOSTICS_H
 
 #ifdef __cplusplus
 
-#include <NPFoundation/Definitions.h>
+#include <KNFoundation/Definitions.h>
 #include <stdarg.h>
 #include <string>
 #include <set>
 
-NP_NAMESPACE_BEGIN(NP)
+KN_NAMESPACE_BEGIN(KN)
 
 class Diagnostics {
     
@@ -74,8 +74,8 @@ public:
     void assertNoError() const;
 };
 
-NP_NAMESPACE_END
+KN_NAMESPACE_END
 
 #endif /* __cplusplus */
 
-#endif /* NP_DIAGNOSTICS_H */
+#endif /* KN_DIAGNOSTICS_H */

@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-    spec.name                           = 'NPFoundation'
+    spec.name                           = 'KNFoundation'
     spec.version                        = '0.1.0'
     spec.license                        = { :type => 'MIT', :file => 'LICENSE' }
     spec.homepage                       = 'https://github.com/nextpangea/npfoundation'
@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
     spec.static_framework = true
     spec.frameworks                     = 'Foundation'
 
-    spec.source_files                   = 'Sources/NPFoundation/**/*.{h,c,m}'
-    spec.public_header_files            = 'Sources/NPFoundation/include/**/*.{h}'
-    spec.module_map                     = 'Sources/NPFoundation/NPFoundation.modulemap'
+    spec.source_files                   = 'Sources/KNFoundation/**/*.{h,c,m}'
+    spec.public_header_files            = 'Sources/KNFoundation/include/**/*.{h}'
+    spec.module_map                     = 'Sources/KNFoundation/KNFoundation.modulemap'
 end

@@ -23,12 +23,12 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/machine.h>
+#include <KNFoundation/machine.h>
 #include <mach/mach_types.h>
 #include <mach/mach_error.h>
 #include <mach/thread_act.h>
 
-#if NP_DESTINATION_IOS || NP_DESTINATION_TVOS || NP_DESTINATION_MACOS || NP_DESTINATION_XROS
+#if KN_DESTINATION_IOS || KN_DESTINATION_TVOS || KN_DESTINATION_MACOS || KN_DESTINATION_XROS
 static bool setState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t number) {
     mach_msg_type_number_t cnt = number;
     kern_return_t kr = thread_get_state(thread, flavor, state, &cnt);
@@ -39,12 +39,12 @@ static bool setState(const thread_t thread, const thread_state_t state, const th
     }
 }
 #else
-NP_STATIC_INLINE bool fillState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t stateCount) {
+KN_STATIC_INLINE bool fillState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t stateCount) {
     return false;
 }
 #endif
 
-bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread) {
+bool KNMachineContextGet(struct KNMachineContext *context, pthread_t thread) {
     if (!context) {
         return false;
     }
@@ -67,7 +67,7 @@ bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread) {
 #endif
 }
 
-uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const context) {
+uintptr_t KNMachineContextGetFramePointer(const struct KNMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__r[7];
 #elif defined(__arm64__)
@@ -79,7 +79,7 @@ uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const c
 #endif
 }
 
-uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const context) {
+uintptr_t KNMachineContextGetStackPointer(const struct KNMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__sp;
 #elif defined(__arm64__)
@@ -91,7 +91,7 @@ uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const c
 #endif
 }
 
-uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *const context) {
+uintptr_t KNMachineContextGetInstructionAddress(const struct KNMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__pc;
 #elif defined(__arm64__)
@@ -103,7 +103,7 @@ uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *c
 #endif
 }
 
-uintptr_t NPMachineContextGetLinkRegister(const struct NPMachineContext *const context) {
+uintptr_t KNMachineContextGetLinkRegister(const struct KNMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__lr;
 #elif defined(__arm64__)

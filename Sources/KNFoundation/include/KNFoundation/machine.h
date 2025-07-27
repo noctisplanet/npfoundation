@@ -1,8 +1,8 @@
 //
-//  NPFoundation.cpp
+//  machine.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 5/6/25.
+//  Created by Jonathan Lee on 6/27/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,4 +23,13 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/NPFoundation.h>
+#ifndef KN_MACHINE_H
+#define KN_MACHINE_H
+
+#if __has_include(<KNFoundation/MachineContext.h>)
+#include <KNFoundation/MachineContext.h>
+#else
+#include <KNFoundation/machine/MachineContext.h>
+#endif
+
+#endif /* KN_MACHINE_H */

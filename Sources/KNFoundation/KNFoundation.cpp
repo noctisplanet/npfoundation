@@ -1,8 +1,8 @@
 //
-//  objc.h
+//  KNFoundation.cpp
 //  npfoundation
 //
-//  Created by Jonathan Lee on 6/14/25.
+//  Created by Jonathan Lee on 5/6/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,4 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_OBJC_H
-#define NP_OBJC_H
-
-#if __has_include(<NPFoundation/NSObjCRuntime.h>)
-#include <NPFoundation/NSObjCRuntime.h>
-#else
-#include <NPFoundation/objc/NSObjCRuntime.h>
-#endif
-
-#endif /* NP_OBJC_H */
+#include <KNFoundation/KNFoundation.h>

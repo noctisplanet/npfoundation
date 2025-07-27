@@ -1,5 +1,5 @@
 //
-//  NPFoundation.h
+//  KNFoundation.h
 //  npfoundation
 //
 //  Created by Jonathan Lee on 5/6/25.
@@ -23,8 +23,8 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/Definitions.h>
-#include <NPFoundation/Diagnostics.h>
-#include <NPFoundation/dispatch.h>
-#include <NPFoundation/machine.h>
-#include <NPFoundation/objc.h>
+#include <KNFoundation/Definitions.h>
+#include <KNFoundation/Diagnostics.h>
+#include <KNFoundation/dispatch.h>
+#include <KNFoundation/machine.h>
+#include <KNFoundation/objc.h>

@@ -23,13 +23,13 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_DISPATCH_H
-#define NP_DISPATCH_H
+#ifndef KN_DISPATCH_H
+#define KN_DISPATCH_H
 
-#if __has_include(<NPFoundation/timer.h>)
-#include <NPFoundation/timer.h>
+#if __has_include(<KNFoundation/timer.h>)
+#include <KNFoundation/timer.h>
 #else
-#include <NPFoundation/dispatch/timer.h>
+#include <KNFoundation/dispatch/timer.h>
 #endif
 
-#endif /* NP_DISPATCH_H */
+#endif /* KN_DISPATCH_H */

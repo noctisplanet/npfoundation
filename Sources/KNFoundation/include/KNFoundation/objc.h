@@ -1,8 +1,8 @@
 //
-//  timer.h
+//  objc.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 7/13/25.
+//  Created by Jonathan Lee on 6/14/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,13 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_DISPATCH_TIMER_H
-#define NP_DISPATCH_TIMER_H
-#ifdef __BLOCKS__
+#ifndef KN_OBJC_H
+#define KN_OBJC_H
 
-#include <NPFoundation/Definitions.h>
-#include <dispatch/dispatch.h>
+#if __has_include(<KNFoundation/NSObjCRuntime.h>)
+#include <KNFoundation/NSObjCRuntime.h>
+#else
+#include <KNFoundation/objc/NSObjCRuntime.h>
+#endif
 
-NP_CEXTERN_BEGIN
-
-NP_EXTERN dispatch_source_t NPDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block);
-
-NP_EXTERN dispatch_source_t NPDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block);
-
-NP_EXTERN void NPDispatchTimerResume(dispatch_source_t timer);
-
-NP_EXTERN void NPDispatchTimerSuspend(dispatch_source_t timer);
-
-NP_EXTERN void NPDispatchTimerCancel(dispatch_source_t timer);
-
-NP_CEXTERN_END
-
-#endif /* __BLOCKS__ */
-#endif /* NP_DISPATCH_TIMER_H */
+#endif /* KN_OBJC_H */

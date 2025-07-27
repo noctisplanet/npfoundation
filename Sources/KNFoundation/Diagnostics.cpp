@@ -23,11 +23,11 @@
 //  SOFTWARE.
 //
 
-#include <NPFoundation/Diagnostics.h>
+#include <KNFoundation/Diagnostics.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-NP_NAMESPACE_BEGIN(NP)
+KN_NAMESPACE_BEGIN(KN)
 
 Diagnostics::Diagnostics(FILE *stream, bool verbose) : Stream(stream), Verbose(verbose) {
     
@@ -117,4 +117,4 @@ void Diagnostics::assertNoError() const {
     }
 }
 
-NP_NAMESPACE_END
+KN_NAMESPACE_END

@@ -24,7 +24,7 @@
 //
 
 #include <Foundation/Foundation.h>
-#include <NPFoundation/NPFoundation.h>
+#include <KNFoundation/KNFoundation.h>
 
 int main(int argc, const char * argv[]) {
     return 0;
