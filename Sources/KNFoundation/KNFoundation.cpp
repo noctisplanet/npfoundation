@@ -1,6 +1,6 @@
 //
 //  KNFoundation.cpp
-//  npfoundation
+//  knfoundation
 //
 //  Created by Jonathan Lee on 5/6/25.
 //

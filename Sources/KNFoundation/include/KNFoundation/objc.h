@@ -1,6 +1,6 @@
 //
 //  objc.h
-//  npfoundation
+//  knfoundation
 //
 //  Created by Jonathan Lee on 6/14/25.
 //

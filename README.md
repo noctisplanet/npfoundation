@@ -5,7 +5,7 @@ KNFoundation
 ## Installation with Swift Package Manager
 ```Swift
 dependencies: [
-    .package(url: "https://github.com/nextpangea/npfoundation.git", branch: "main")
+    .package(url: "https://github.com/kainian/knfoundation.git", branch: "main")
 ]
 ```
 

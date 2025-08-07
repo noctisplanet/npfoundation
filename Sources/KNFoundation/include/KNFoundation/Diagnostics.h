@@ -1,6 +1,6 @@
 //
 //  Diagnostics.h
-//  npfoundation
+//  knfoundation
 //
 //  Created by Jonathan Lee on 6/22/25.
 //

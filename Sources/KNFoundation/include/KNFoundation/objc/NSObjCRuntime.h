@@ -1,6 +1,6 @@
 //
 //  NSObjCRuntime.h
-//  npfoundation
+//  knfoundation
 //
 //  Created by Jonathan Lee on 5/6/25.
 //
@@ -36,6 +36,11 @@
 
 KN_CEXTERN_BEGIN
 
+struct _kn_objc_super2 {
+    id _Nonnull receiver;
+    Class _Nonnull current_class;
+};
+
 KN_EXTERN Method _Nullable KNClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name);
 
 KN_EXTERN Method _Nullable KNClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name);
@@ -50,7 +55,7 @@ KN_CEXTERN_END
 // (id self, SEL name, ) >> (id self, SEL name, )
 #define _KN_FUNCTION_ARGS_(A1,A2,ARGS...) A1, A2, ##ARGS
 // (id self, SEL name, ) >> (struct objc_super *super, SEL name, )
-#define _KN_OBJCSUPER_ARGS_(A1,A2,ARGS...) _KN_GUARD_(struct objc_super *super), A2, ##ARGS
+#define _KN_OBJCSUPER_ARGS_(A1,A2,ARGS...) _KN_GUARD_(struct _kn_objc_super2 *super), A2, ##ARGS
 
 // A >> A
 #define KN_RETURN(TYPE) TYPE
@@ -115,6 +120,7 @@ KN_CEXTERN_END
 ///
 #define KN_CLASS_OVERRIDEMETHOD_BEGIN(CLASS,SELECTOR,TYPES,RETURN,ARGS)                                                     \
     do {                                                                                                                    \
+        OBJC_EXPORT void objc_msgSendSuper2(struct _kn_objc_super2 * super, SEL op, ...);                                   \
         typedef __typeof(RETURN)(*_KN_OBJC_MSGSENDSUPER)(_KN_OBJCSUPER_ARGS_(ARGS));                                        \
         Class                 _kn_cls               = (CLASS);                                                              \
         SEL                   _kn_sel               = (SELECTOR);                                                           \
@@ -122,7 +128,7 @@ KN_CEXTERN_END
         Method                _kn_super_method      = NULL;                                                                 \
         __block IMP           _kn_imp               = NULL;                                                                 \
         __block bool          _kn_success           = false;                                                                \
-        _KN_OBJC_MSGSENDSUPER _kn_objc_msgsendsuper = (_KN_OBJC_MSGSENDSUPER)objc_msgSendSuper;                             \
+        _KN_OBJC_MSGSENDSUPER _kn_objc_msgsendsuper = (_KN_OBJC_MSGSENDSUPER)objc_msgSendSuper2;                            \
         if (_kn_cls && _kn_sel) {                                                                                           \
             _kn_super_method                        = KNClassGetSuperMethod(_kn_cls, _kn_sel);                              \
             if (_kn_super_method) {                                                                                         \
@@ -142,7 +148,7 @@ KN_CEXTERN_END
     } while(false);
 
 #define KN_MAKE_OBJC_SUPER(ID)                                                                                              \
-    struct objc_super _kn_objc_super                = { (ID), class_getSuperclass(_kn_cls) };                               \
+    struct _kn_objc_super2 _kn_objc_super           = { (ID), _kn_cls };                                                    \
 
 #define KN_METHOD_OVERRIDE(ARGS...)                                                                                         \
     _kn_objc_msgsendsuper(&_kn_objc_super, ARGS)
