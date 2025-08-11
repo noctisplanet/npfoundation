@@ -23,6 +23,9 @@
 //  SOFTWARE.
 //
 
+#ifndef KN_DEFINITION_H
+#define KN_DEFINITION_H
+
 #ifdef __APPLE__
 #include <Availability.h>
 #include <TargetConditionals.h>
@@ -68,3 +71,27 @@
 
 #define KN_NAMESPACE_BEGIN(NAME) namespace NAME {
 #define KN_NAMESPACE_END }
+
+#ifdef __cplusplus
+
+KN_NAMESPACE_BEGIN(KN)
+
+// Mix-in for classes that must not be copied.
+class nocopy {
+  
+private:
+    
+    nocopy(const nocopy&) = delete;
+    const nocopy& operator=(const nocopy&) = delete;
+    
+protected:
+    
+    constexpr nocopy() = default;
+    ~nocopy() = default;
+};
+
+KN_NAMESPACE_END
+
+#endif /* __cplusplus */
+
+#endif /* KN_DEFINITION_H */

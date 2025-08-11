@@ -1,8 +1,8 @@
 //
-//  KNFoundation.h
+//  CopyOnWritePointer.cpp
 //  knfoundation
 //
-//  Created by Jonathan Lee on 5/6/25.
+//  Created by Jonathan Lee on 8/9/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,3 @@
 //  SOFTWARE.
 //
 
-#include <KNFoundation/CopyOnWritePointer.h>
-#include <KNFoundation/Definitions.h>
-#include <KNFoundation/Diagnostics.h>
-#include <KNFoundation/dispatch.h>
-#include <KNFoundation/machine.h>
-#include <KNFoundation/objc.h>
