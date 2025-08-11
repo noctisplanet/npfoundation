@@ -23,7 +23,7 @@
 //  SOFTWARE.
 //
 
-#include <KNFoundation/CopyOnWritePointer.h>
+#include <KNFoundation/CopyOnWriteBacked.h>
 #include <KNFoundation/Definitions.h>
 #include <KNFoundation/Diagnostics.h>
 #include <KNFoundation/dispatch.h>

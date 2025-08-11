@@ -77,17 +77,17 @@
 KN_NAMESPACE_BEGIN(KN)
 
 // Mix-in for classes that must not be copied.
-class nocopy {
+class Nocopy {
   
 private:
     
-    nocopy(const nocopy&) = delete;
-    const nocopy& operator=(const nocopy&) = delete;
+    Nocopy(const Nocopy&) = delete;
+    const Nocopy& operator=(const Nocopy&) = delete;
     
 protected:
     
-    constexpr nocopy() = default;
-    ~nocopy() = default;
+    constexpr Nocopy() = default;
+    ~Nocopy() = default;
 };
 
 KN_NAMESPACE_END
