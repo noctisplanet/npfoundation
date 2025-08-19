@@ -1,8 +1,8 @@
 //
-//  dispatch.h
+//  schedule.h
 //  knfoundation
 //
-//  Created by Jonathan Lee on 7/13/25.
+//  Created by Jonathan Lee on 8/14/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,21 @@
 //  SOFTWARE.
 //
 
-#ifndef KN_DISPATCH_H
-#define KN_DISPATCH_H
+#ifndef KN_DISPATCH_SCHEDULE_H
+#define KN_DISPATCH_SCHEDULE_H
+#ifdef __BLOCKS__
 
-#if __has_include(<KNFoundation/timer.h>)
-#include <KNFoundation/timer.h>
-#include <KNFoundation/schedule.h>
-#else
-#include <KNFoundation/dispatch/timer.h>
-#include <KNFoundation/dispatch/schedule.h>
-#endif
+#include <KNFoundation/Definitions.h>
+#include <dispatch/dispatch.h>
 
-#endif /* KN_DISPATCH_H */
+KN_CEXTERN_BEGIN
+
+KN_EXTERN void KNDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+
+KN_EXTERN void KNDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+
+KN_CEXTERN_END
+
+#endif /* __BLOCKS__ */
+#endif /* KN_DISPATCH_SCHEDULE_H */
+
