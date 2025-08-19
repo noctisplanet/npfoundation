@@ -1,0 +1,75 @@
+//
+//  NSValueObserving.m
+//  knfoundation
+//
+//  Created by Jonathan Lee on 8/19/25.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
+//
+
+#import <KNFoundation/objc.h>
+
+#import <objc/runtime.h>
+#import <Foundation/Foundation.h>
+
+@interface KNNSValueObserving : NSObject
+
+@property (nonatomic, strong) NSMutableArray<dispatch_block_t> *handlers;
+
+@end
+
+@implementation KNNSValueObserving
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _handlers = [NSMutableArray new];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    for (dispatch_block_t handler in _handlers) {
+        handler();
+    }
+    [_handlers removeAllObjects];
+}
+
+- (void)addObserverHandler:(dispatch_block_t)handler {
+    [_handlers addObject:handler];
+}
+
+@end
+
+void KNAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler) {
+    static uint8_t key = 0;
+    if (!observable) {
+        handler();
+        return;
+    }
+    
+    KNNSValueObserving *observing = nil;
+    @synchronized (observable) {
+        observing = objc_getAssociatedObject(observable, &key);
+        if (!observing) {
+            observing = [KNNSValueObserving new];
+            objc_setAssociatedObject(observable, &key, observing, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        [observing addObserverHandler:handler];
+    }
+}

@@ -1,8 +1,8 @@
 //
-//  objc.h
+//  NSValueObserving.h
 //  knfoundation
 //
-//  Created by Jonathan Lee on 6/14/25.
+//  Created by Jonathan Lee on 8/19/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,18 @@
 //  SOFTWARE.
 //
 
-#ifndef KN_OBJC_H
-#define KN_OBJC_H
+#ifndef KN_OBJC_NSVALUEOBSERVING_H
+#define KN_OBJC_NSVALUEOBSERVING_H
+#ifdef __OBJC__
 
-#if __has_include(<KNFoundation/NSObjCRuntime.h>)
-#include <KNFoundation/NSObjCRuntime.h>
-#include <KNFoundation/NSValueObserving.h>
-#else
-#include <KNFoundation/objc/NSObjCRuntime.h>
-#include <KNFoundation/objc/NSValueObserving.h>
-#endif
+#include <KNFoundation/Definitions.h>
+#include <Foundation/Foundation.h>
 
-#endif /* KN_OBJC_H */
+KN_CEXTERN_BEGIN
+
+KN_EXTERN void KNAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler);
+
+KN_CEXTERN_END
+
+#endif /* __OBJC__ */
+#endif /* KN_OBJC_NSVALUEOBSERVING_H */

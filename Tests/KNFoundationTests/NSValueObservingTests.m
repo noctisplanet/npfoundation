@@ -1,8 +1,8 @@
 //
-//  timer.h
+//  NSValueObservingTests.m
 //  knfoundation
 //
-//  Created by Jonathan Lee on 7/13/25.
+//  Created by Jonathan Lee on 8/19/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,33 @@
 //  SOFTWARE.
 //
 
-#include <KNFoundation/dispatch.h>
+#import <XCTest/XCTest.h>
+#import <KNFoundation/KNFoundation.h>
 
-dispatch_source_t KNDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    if (queue == NULL) {
-        queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
+@interface NSValueObservingTests : XCTestCase
+
+@end
+
+@implementation NSValueObservingTests
+
+- (void)setUp {
+    
+    // Put setup code here. This method is called before the invocation of each test method in the class.
+}
+
+- (void)tearDown {
+    // Put teardown code here. This method is called after the invocation of each test method in the class.
+}
+
+- (void)testAttachDeallocationHandler {
+    __block bool success = false;
+    {
+        NSObject *observable = [NSObject new];
+        KNAttachDeallocationHandler(observable, ^{
+            success = true;
+        });
     }
-    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, interval * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
-    dispatch_source_set_event_handler(timer, block);
-    return timer;
+    XCTAssertTrue(success);
 }
 
-dispatch_source_t KNDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    dispatch_source_t timer = KNDispatchTimerCreate(queue, interval, block);
-    dispatch_activate(timer);
-    return timer;
-}
-
-void KNDispatchTimerResume(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_resume(timer);
-    }
-}
-
-void KNDispatchTimerSuspend(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_suspend(timer);
-    }
-}
-
-void KNDispatchTimerCancel(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_source_cancel(timer);
-    }
-}
+@end

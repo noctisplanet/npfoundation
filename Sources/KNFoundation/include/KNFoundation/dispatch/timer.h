@@ -27,14 +27,29 @@
 #define KN_DISPATCH_TIMER_H
 #ifdef __BLOCKS__
 
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+#endif /* __OBJC__ */
+
+#include <CoreFoundation/CoreFoundation.h>
 #include <KNFoundation/Definitions.h>
 #include <dispatch/dispatch.h>
 
 KN_CEXTERN_BEGIN
 
+struct kn_timer_t {
+    CFTypeRef ref;
+};
+
+typedef struct kn_timer_t * kn_timer;
+
 KN_EXTERN dispatch_source_t KNDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block);
 
 KN_EXTERN dispatch_source_t KNDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block);
+
+#ifdef __OBJC__
+KN_EXTERN dispatch_source_t KNDispatchTimerFireWithObservable(id observable, dispatch_queue_t queue, double interval, dispatch_block_t block);
+#endif /* __OBJC__ */
 
 KN_EXTERN void KNDispatchTimerResume(dispatch_source_t timer);
 
