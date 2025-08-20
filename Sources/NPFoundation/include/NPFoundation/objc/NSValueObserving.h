@@ -32,7 +32,7 @@
 
 NP_CEXTERN_BEGIN
 
-NP_EXTERN void KNAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler);
+NP_EXTERN void NPAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler);
 
 NP_CEXTERN_END
 

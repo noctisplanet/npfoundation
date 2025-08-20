@@ -45,7 +45,7 @@
     __block bool success = false;
     {
         NSObject *observable = [NSObject new];
-        KNAttachDeallocationHandler(observable, ^{
+        NPAttachDeallocationHandler(observable, ^{
             success = true;
         });
     }

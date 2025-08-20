@@ -27,94 +27,104 @@
 #include <NPFoundation/objc.h>
 #include <os/lock.h>
 
-struct _np_timer_t {
-    CFTypeRef ref;
-    os_unfair_lock lock;
-    bool running;
-    bool canceled;
-};
-typedef struct _np_timer_t * _np_timer;
-
-static _np_timer _np_timer_create(dispatch_source_t timer, bool activated) {
-    _np_timer this = malloc(sizeof(struct _np_timer_t));
-    this->ref = CFBridgingRetain(timer);
-    this->lock = OS_UNFAIR_LOCK_INIT;
-    this->running = activated;
-    this->canceled = false;
-    return this;
+@interface _NPTimer : NSObject {
+    bool _isCancelled;
+    bool _isSuspended;
+    os_unfair_lock _unfair_lock;
 }
 
-NP_STATIC_INLINE void _np_timer_resume(_np_timer this) {
-    if (!this) return;
-    if (!this->canceled && !this->running) {
-        dispatch_source_t timer = (__bridge dispatch_source_t)(this->ref);
+@end
+
+@implementation _NPTimer
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _isCancelled = false;
+        _isSuspended = false;
+        _unfair_lock = OS_UNFAIR_LOCK_INIT;
+    }
+    return self;
+}
+
+- (void)resume:(NPTimer)timer {
+    bool isExecutable = false;
+    os_unfair_lock_lock(&_unfair_lock);
+    if (!_isCancelled && _isSuspended) {
+        _isSuspended = false;
+        isExecutable = true;
+    }
+    os_unfair_lock_unlock(&_unfair_lock);
+    if (isExecutable) {
         dispatch_resume(timer);
-        this->running = true;
     }
 }
 
-NP_STATIC_INLINE void _np_timer_suspend(_np_timer this) {
-    if (!this) return;
-    if (!this->canceled && this->running) {
-        dispatch_source_t timer = (__bridge dispatch_source_t)(this->ref);
+- (void)suspend:(NPTimer)timer {
+    bool isExecutable = false;
+    os_unfair_lock_lock(&_unfair_lock);
+    if (!_isCancelled && !_isSuspended) {
+        _isSuspended = true;
+        isExecutable = true;
+    }
+    os_unfair_lock_unlock(&_unfair_lock);
+    if (isExecutable) {
         dispatch_suspend(timer);
-        this->running = false;
     }
 }
 
-NP_STATIC_INLINE void _np_timer_cancel(_np_timer this) {
-    if (!this) return;
-    if (!this->canceled) {
-        CFBridgingRelease(this->ref);
-        this->ref = nil;
-        this->running = true;
-        this->canceled = true;
+- (void)cancel:(NPTimer)timer {
+    bool isExecutable = false;
+    os_unfair_lock_lock(&_unfair_lock);
+    if (!_isCancelled) {
+        _isCancelled = true;
+        isExecutable = true;
+    }
+    os_unfair_lock_unlock(&_unfair_lock);
+    if (isExecutable) {
+        dispatch_source_cancel(timer);
     }
 }
 
-dispatch_source_t KNDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    if (queue == NULL) {
-        queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
-    }
-    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, interval * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
-    dispatch_source_set_event_handler(timer, block);
-    return timer;
+@end
+
+static UInt8 gTimerKey = 0;
+NP_STATIC_INLINE void setAssociated(NPTimer timer) {
+    objc_setAssociatedObject(timer, &gTimerKey, [_NPTimer new], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-dispatch_source_t KNDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    if (queue == NULL) {
-        queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
+NP_STATIC_INLINE _NPTimer * associated(NPTimer timer) {
+    id value = objc_getAssociatedObject(timer, &gTimerKey);
+    return objc_getAssociatedObject(timer, &gTimerKey);
+}
+
+NPTimer NPDispatchTimer(dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block) {
+    if (dispatchQueue == NULL) {
+        dispatchQueue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
     }
-    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, interval * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
+    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatchQueue);
+    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, intervalInSeconds * NSEC_PER_SEC, leewayInSeconds * NSEC_PER_SEC);
     dispatch_source_set_event_handler(timer, block);
     dispatch_activate(timer);
+    setAssociated(timer);
     return timer;
 }
 
-dispatch_source_t KNDispatchTimerFireWithObservable(id observable, dispatch_queue_t queue, double interval, dispatch_block_t block) {
-    dispatch_source_t timer = KNDispatchTimerFire(queue, interval, block);
-    KNAttachDeallocationHandler(observable, ^{
-        KNDispatchTimerCancel(timer);
+NPTimer NPDispatchTimerObservable(id observable, dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block) {
+    NPTimer timer = NPDispatchTimer(dispatchQueue, intervalInSeconds, leewayInSeconds, block);
+    NPAttachDeallocationHandler(observable, ^{
+        NPDispatchTimerCancel(timer);
     });
     return timer;
 }
 
-void KNDispatchTimerResume(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_resume(timer);
-    }
+void NPDispatchTimerResume(NPTimer timer) {
+    [associated(timer) resume:timer];
 }
 
-void KNDispatchTimerSuspend(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_suspend(timer);
-    }
+void NPDispatchTimerSuspend(NPTimer timer) {
+    [associated(timer) suspend:timer];
 }
 
-void KNDispatchTimerCancel(dispatch_source_t timer) {
-    if (timer) {
-        dispatch_source_cancel(timer);
-    }
+void NPDispatchTimerCancel(NPTimer timer) {
+    [associated(timer) cancel:timer];
 }

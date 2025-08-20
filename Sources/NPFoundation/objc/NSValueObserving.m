@@ -28,13 +28,13 @@
 #import <objc/runtime.h>
 #import <Foundation/Foundation.h>
 
-@interface KNNSValueObserving : NSObject
+@interface NPNSValueObserving : NSObject
 
 @property (nonatomic, strong) NSMutableArray<dispatch_block_t> *handlers;
 
 @end
 
-@implementation KNNSValueObserving
+@implementation NPNSValueObserving
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -56,18 +56,18 @@
 
 @end
 
-void KNAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler) {
+void NPAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler) {
     static uint8_t key = 0;
     if (!observable) {
         handler();
         return;
     }
     
-    KNNSValueObserving *observing = nil;
+    NPNSValueObserving *observing = nil;
     @synchronized (observable) {
         observing = objc_getAssociatedObject(observable, &key);
         if (!observing) {
-            observing = [KNNSValueObserving new];
+            observing = [NPNSValueObserving new];
             objc_setAssociatedObject(observable, &key, observing, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
         [observing addObserverHandler:handler];

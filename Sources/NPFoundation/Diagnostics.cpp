@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-NP_NAMESPACE_BEGIN(KN)
+NP_NAMESPACE_BEGIN(NP)
 
 Diagnostics::Diagnostics(FILE *stream, bool verbose) : Stream(stream), Verbose(verbose) {
     

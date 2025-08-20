@@ -27,35 +27,29 @@
 #define NP_DISPATCH_TIMER_H
 #ifdef __BLOCKS__
 
-#ifdef __OBJC__
-#import <Foundation/Foundation.h>
-#endif /* __OBJC__ */
-
 #include <CoreFoundation/CoreFoundation.h>
 #include <NPFoundation/Definitions.h>
 #include <dispatch/dispatch.h>
 
 NP_CEXTERN_BEGIN
 
-struct np_timer_t {
-    CFTypeRef ref;
-};
-
-typedef struct np_timer_t * np_timer;
-
-NP_EXTERN dispatch_source_t KNDispatchTimerCreate(dispatch_queue_t queue, double interval, dispatch_block_t block);
-
-NP_EXTERN dispatch_source_t KNDispatchTimerFire(dispatch_queue_t queue, double interval, dispatch_block_t block);
+typedef dispatch_source_t NPTimer;
 
 #ifdef __OBJC__
-NP_EXTERN dispatch_source_t KNDispatchTimerFireWithObservable(id observable, dispatch_queue_t queue, double interval, dispatch_block_t block);
+
+#import <Foundation/Foundation.h>
+
+NP_EXTERN NPTimer NPDispatchTimerObservable(id observable, dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
+
 #endif /* __OBJC__ */
 
-NP_EXTERN void KNDispatchTimerResume(dispatch_source_t timer);
+NP_EXTERN NPTimer NPDispatchTimer(dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
 
-NP_EXTERN void KNDispatchTimerSuspend(dispatch_source_t timer);
+NP_EXTERN void NPDispatchTimerResume(NPTimer timer);
 
-NP_EXTERN void KNDispatchTimerCancel(dispatch_source_t timer);
+NP_EXTERN void NPDispatchTimerSuspend(NPTimer timer);
+
+NP_EXTERN void NPDispatchTimerCancel(NPTimer timer);
 
 NP_CEXTERN_END
 

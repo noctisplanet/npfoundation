@@ -33,7 +33,7 @@
 #include <string>
 #include <set>
 
-NP_NAMESPACE_BEGIN(KN)
+NP_NAMESPACE_BEGIN(NP)
 
 class Diagnostics {
     

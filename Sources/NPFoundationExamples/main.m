@@ -27,34 +27,6 @@
 #include <NPFoundation/NPFoundation.h>
 
 int main(int argc, const char * argv[]) {
-    {
-        NSObject *observable = [NSObject new];
-        dispatch_source_t timer = KNDispatchTimerFireWithObservable(observable, dispatch_get_global_queue(0, 0), 0.1, ^{
-            NSLog(@"%@", NSDate.new);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerSuspend(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerResume(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerResume(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerCancel(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerSuspend(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            KNDispatchTimerResume(timer);
-        });
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)), dispatch_get_global_queue(0, 0), ^{
-            NSLog(@"%@", observable);
-        });
-    }
-    
-    [NSThread sleepForTimeInterval:20];
+    [NSThread sleepForTimeInterval:5];
     return 0;
 }

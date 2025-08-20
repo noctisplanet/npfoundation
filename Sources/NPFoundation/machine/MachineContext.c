@@ -44,7 +44,7 @@ NP_STATIC_INLINE bool fillState(const thread_t thread, const thread_state_t stat
 }
 #endif
 
-bool KNMachineContextGet(struct KNMachineContext *context, pthread_t thread) {
+bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread) {
     if (!context) {
         return false;
     }
@@ -67,7 +67,7 @@ bool KNMachineContextGet(struct KNMachineContext *context, pthread_t thread) {
 #endif
 }
 
-uintptr_t KNMachineContextGetFramePointer(const struct KNMachineContext *const context) {
+uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__r[7];
 #elif defined(__arm64__)
@@ -79,7 +79,7 @@ uintptr_t KNMachineContextGetFramePointer(const struct KNMachineContext *const c
 #endif
 }
 
-uintptr_t KNMachineContextGetStackPointer(const struct KNMachineContext *const context) {
+uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__sp;
 #elif defined(__arm64__)
@@ -91,7 +91,7 @@ uintptr_t KNMachineContextGetStackPointer(const struct KNMachineContext *const c
 #endif
 }
 
-uintptr_t KNMachineContextGetInstructionAddress(const struct KNMachineContext *const context) {
+uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__pc;
 #elif defined(__arm64__)
@@ -103,7 +103,7 @@ uintptr_t KNMachineContextGetInstructionAddress(const struct KNMachineContext *c
 #endif
 }
 
-uintptr_t KNMachineContextGetLinkRegister(const struct KNMachineContext *const context) {
+uintptr_t NPMachineContextGetLinkRegister(const struct NPMachineContext *const context) {
 #if defined(__arm__)
     return context->data.__ss.__lr;
 #elif defined(__arm64__)

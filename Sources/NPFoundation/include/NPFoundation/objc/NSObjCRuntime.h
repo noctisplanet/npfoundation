@@ -41,9 +41,9 @@ struct _np_objc_super2 {
     Class _Nonnull current_class;
 };
 
-NP_EXTERN Method _Nullable KNClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name);
+NP_EXTERN Method _Nullable NPClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name);
 
-NP_EXTERN Method _Nullable KNClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name);
+NP_EXTERN Method _Nullable NPClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name);
 
 NP_CEXTERN_END
 
@@ -96,7 +96,7 @@ NP_CEXTERN_END
         __block IMP          _np_imp      = NULL;                                                                           \
         __block _NP_NEXT_IMP _np_next_imp = NULL;                                                                           \
         if (_np_cls && _np_sel) {                                                                                           \
-            _np_method                    = KNClassGetOwnMethod(_np_cls, _np_sel);                                          \
+            _np_method                    = NPClassGetOwnMethod(_np_cls, _np_sel);                                          \
             if (_np_method) {                                                                                               \
                 _np_types                 = (TYPES);                                                                        \
                 if (!_np_types) {                                                                                           \
@@ -130,7 +130,7 @@ NP_CEXTERN_END
         __block bool          _np_success           = false;                                                                \
         _NP_OBJC_MSGSENDSUPER _np_objc_msgsendsuper = (_NP_OBJC_MSGSENDSUPER)objc_msgSendSuper2;                            \
         if (_np_cls && _np_sel) {                                                                                           \
-            _np_super_method                        = KNClassGetSuperMethod(_np_cls, _np_sel);                              \
+            _np_super_method                        = NPClassGetSuperMethod(_np_cls, _np_sel);                              \
             if (_np_super_method) {                                                                                         \
                 _np_types                           = (TYPES);                                                              \
                 if (!_np_types) {                                                                                           \

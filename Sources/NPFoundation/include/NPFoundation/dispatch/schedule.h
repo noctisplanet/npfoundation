@@ -32,9 +32,9 @@
 
 NP_CEXTERN_BEGIN
 
-NP_EXTERN void KNDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+NP_EXTERN void NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
 
-NP_EXTERN void KNDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+NP_EXTERN void NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
 
 NP_CEXTERN_END
 

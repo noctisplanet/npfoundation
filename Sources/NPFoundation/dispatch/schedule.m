@@ -26,7 +26,7 @@
 #include <NPFoundation/dispatch.h>
 #include <Foundation/Foundation.h>
 
-void KNDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
+void NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
     static dispatch_queue_t queue = NULL;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -47,7 +47,7 @@ void KNDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, disp
     };
 }
 
-void KNDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
+void NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
     static dispatch_queue_t queue = NULL;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

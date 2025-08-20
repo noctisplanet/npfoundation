@@ -26,7 +26,7 @@
 #import <XCTest/XCTest.h>
 #import <NPFoundation/NPFoundation.h>
 
-using namespace KN;
+using namespace NP;
 
 @interface DiagnosticsTests : XCTestCase
 

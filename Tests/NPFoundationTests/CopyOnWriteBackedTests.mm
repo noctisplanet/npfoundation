@@ -31,7 +31,7 @@ struct DataSources {
     }
 };
 
-using namespace KN;
+using namespace NP;
 
 @interface CopyOnWriteBackedTests : XCTestCase
 

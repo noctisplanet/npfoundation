@@ -31,7 +31,7 @@
 #include <NPFoundation/Definitions.h>
 #include <atomic>
 
-NP_NAMESPACE_BEGIN(KN)
+NP_NAMESPACE_BEGIN(NP)
 
 template <typename T>
 class CopyOnWriteBacked {

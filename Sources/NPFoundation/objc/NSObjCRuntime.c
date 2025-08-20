@@ -27,7 +27,7 @@
 #include <objc/message.h>
 #include <objc/runtime.h>
 
-Method _Nullable KNClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name) {
+Method _Nullable NPClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name) {
     unsigned int outCount = 0;
     Method *methods = class_copyMethodList(cls, &outCount);
     if (methods) {
@@ -44,7 +44,7 @@ Method _Nullable KNClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name) {
     return NULL;
 }
 
-Method _Nullable KNClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name) {
+Method _Nullable NPClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name) {
     Class super = class_getSuperclass(cls);
     if (!super)
         return NULL;

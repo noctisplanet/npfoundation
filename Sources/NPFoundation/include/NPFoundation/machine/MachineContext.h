@@ -33,7 +33,7 @@
 
 NP_CEXTERN_BEGIN
 
-struct KNMachineContext {
+struct NPMachineContext {
 //#ifdef __arm64__
 //    _STRUCT_MCONTEXT64 data;
 //#else
@@ -41,15 +41,15 @@ struct KNMachineContext {
 //#endif
 };
 
-NP_EXTERN bool KNMachineContextGet(struct KNMachineContext *context, pthread_t thread);
+NP_EXTERN bool NPMachineContextGet(struct NPMachineContext *context, pthread_t thread);
 
-NP_EXTERN uintptr_t KNMachineContextGetFramePointer(const struct KNMachineContext *const context);
+NP_EXTERN uintptr_t NPMachineContextGetFramePointer(const struct NPMachineContext *const context);
 
-NP_EXTERN uintptr_t KNMachineContextGetStackPointer(const struct KNMachineContext *const context);
+NP_EXTERN uintptr_t NPMachineContextGetStackPointer(const struct NPMachineContext *const context);
 
-NP_EXTERN uintptr_t KNMachineContextGetInstructionAddress(const struct KNMachineContext *const context);
+NP_EXTERN uintptr_t NPMachineContextGetInstructionAddress(const struct NPMachineContext *const context);
 
-NP_EXTERN uintptr_t KNMachineContextGetLinkRegister(const struct KNMachineContext *const context);
+NP_EXTERN uintptr_t NPMachineContextGetLinkRegister(const struct NPMachineContext *const context);
 
 NP_CEXTERN_END
 
