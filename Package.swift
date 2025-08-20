@@ -4,32 +4,32 @@
 import PackageDescription
 
 let package = Package(
-    name: "knfoundation",
+    name: "npfoundation",
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "KNFoundation",
+            name: "NPFoundation",
             targets: [
-                "KNFoundation"
+                "NPFoundation"
             ]),
         .executable(
-            name: "KNFoundationExamples",
+            name: "NPFoundationExamples",
             targets: [
-                "KNFoundationExamples"
+                "NPFoundationExamples"
             ])
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "KNFoundation"),
+            name: "NPFoundation"),
         
         .testTarget(
-            name: "KNFoundationTests",
-            dependencies: ["KNFoundation"]),
+            name: "NPFoundationTests",
+            dependencies: ["NPFoundation"]),
         
         .executableTarget(
-            name: "KNFoundationExamples",
-            dependencies: ["KNFoundation"]),
+            name: "NPFoundationExamples",
+            dependencies: ["NPFoundation"]),
     ]
 )
