@@ -32,6 +32,13 @@
 
 NP_CEXTERN_BEGIN
 
+/// Attaches a deallocation handler to an observable object.
+/// The provided handler block will be invoked when the observable object is deallocated.
+///
+/// - Parameters:
+///   - observable: The object to observe for deallocation.
+///   - handler: The block to execute when the observable object is deallocated.
+///              This block will be copied and retained until the observable is deallocated.
 NP_EXTERN void NPAttachDeallocationHandler(id<NSObject> observable, dispatch_block_t handler);
 
 NP_CEXTERN_END

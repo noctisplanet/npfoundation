@@ -58,9 +58,9 @@ using namespace NP;
     XCTAssertTrue(cow1.get() == cow2.get());
     XCTAssertTrue(cow1.retainCount() == 2);
     XCTAssertTrue(cow2.retainCount() == 2);
-    cow1->ctest();
+    cow1.acquireUnique()->ctest();
     XCTAssertTrue(cow1.retainCount() == 1);
-    cow2->test();
+    cow2.acquireUnique()->test();
     XCTAssertTrue(cow2.retainCount() == 1);
 }
 

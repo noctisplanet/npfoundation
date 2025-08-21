@@ -34,12 +34,33 @@ NP_CEXTERN_BEGIN
 
 typedef dispatch_block_t NPScheduleWork;
 
+/// Schedules a throttled execution of a callback function on a specified dispatch queue.
+///
+/// Throttling ensures the callback is executed at most once within the specified delay period,
+/// regardless of how many times the returned NPScheduleWork function is called.
+/// - Parameters:
+///   - delayInSeconds: The minimum delay (in seconds) between allowed callback executions.
+///                     Subsequent calls to the returned NPScheduleWork within this delay window will be ignored.
+///   - on: The dispatch queue on which to execute the callback function.
+///   - callback: The function to execute when the throttling condition is met.
 NP_EXTERN NPScheduleWork NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
 
+/// Schedules a debounced execution of a callback function on a specified dispatch queue.
+///
+/// Debouncing delays the callback execution until after the specified delay has elapsed
+/// without receiving new calls to the returned NPScheduleWork function.
+///
+/// - Parameters:
+///   - delayInSeconds: The debounce delay (in seconds) that must pass without new calls
+///                     to the returned NPScheduleWork before the callback is executed.
+///   - leewayInSeconds: The allowed leeway (in seconds) for timer execution to optimize
+///                     power consumption and performance. A positive value indicates
+///                     the system may delay timer firing within this tolerance.
+///   - on: The dispatch queue on which to execute the callback function.
+///   - callback: The function to execute when the debounce condition is met.
 NP_EXTERN NPScheduleWork NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
 
 NP_CEXTERN_END
 
 #endif /* __BLOCKS__ */
 #endif /* NP_DISPATCH_SCHEDULE_H */
-

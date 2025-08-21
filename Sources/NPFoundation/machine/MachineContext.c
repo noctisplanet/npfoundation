@@ -39,7 +39,7 @@ static bool setState(const thread_t thread, const thread_state_t state, const th
     }
 }
 #else
-NP_STATIC_INLINE bool fillState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t stateCount) {
+NP_STATIC_INLINE bool setState(const thread_t thread, const thread_state_t state, const thread_state_flavor_t flavor, const mach_msg_type_number_t stateCount) {
     return false;
 }
 #endif

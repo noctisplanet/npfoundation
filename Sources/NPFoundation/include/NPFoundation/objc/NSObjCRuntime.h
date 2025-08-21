@@ -41,8 +41,16 @@ struct _np_objc_super2 {
     Class _Nonnull current_class;
 };
 
+/// Returns a specified instance method for a given class, excluding inherited methods.
+/// - Parameters:
+///   - cls: A pointer to a class definition
+///   - name: A pointer of type \c SEL.
 NP_EXTERN Method _Nullable NPClassGetOwnMethod(Class _Nullable cls, SEL _Nonnull name);
 
+/// Returns a specified instance method for the superclass of a given class.
+/// - Parameters:
+///   - cls: cls A pointer to a class definition
+///   - name: name A pointer of type \c SEL.
 NP_EXTERN Method _Nullable NPClassGetSuperMethod(Class _Nullable cls, SEL _Nonnull name);
 
 NP_CEXTERN_END

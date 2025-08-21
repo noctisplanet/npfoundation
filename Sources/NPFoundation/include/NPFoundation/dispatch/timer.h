@@ -39,16 +39,48 @@ typedef dispatch_source_t NPTimer;
 
 #import <Foundation/Foundation.h>
 
+/// Creates a new timer to monitor low-level system events with automatic lifecycle management.
+///
+/// The timer is automatically activated and its lifecycle is bound to the observable object.
+/// When the observable object is deallocated, the timer will be automatically cancelled.
+///
+/// - Parameters:
+///   - observable: The object to which the timer's lifecycle will be bound.
+///   - dispatchQueue: The dispatch queue to which the event handler block is submitted.
+///   - intervalInSeconds: The seconds interval for the timer.
+///   - leewayInSeconds: The amount of time, in nanoseconds, that the system can defer the timer.
+///   - block: The event handler block to submit to the source’s target queue.
+///            This function performs a Block_copy on behalf of the caller,
+///            and Block_release on the previous handler (if any).
+///            This parameter cannot be NULL.
 NP_EXTERN NPTimer NPDispatchTimerObservable(id observable, dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
 
 #endif /* __OBJC__ */
 
+/// Creates a new timer to monitor low-level system events.
+///
+/// The timer is automatically activated.
+///
+/// - Parameters:
+///   - dispatchQueue: The dispatch queue to which the event handler block is submitted.
+///   - intervalInSeconds: The seconds interval for the timer.
+///   - leewayInSeconds: The amount of time, in nanoseconds, that the system can defer the timer.
+///   - block: The event handler block to submit to the source’s target queue.
+///            This function performs a Block_copy on behalf of the caller,
+///            and Block_release on the previous handler (if any).
+///            This parameter cannot be NULL.
 NP_EXTERN NPTimer NPDispatchTimer(dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
 
+/// Asynchronously resume the NPTimer
+/// - Parameter timer: The timer to resume
 NP_EXTERN void NPDispatchTimerResume(NPTimer timer);
 
+/// Asynchronously suspend the NPTimer
+/// - Parameter timer: The timer to suspend
 NP_EXTERN void NPDispatchTimerSuspend(NPTimer timer);
 
+/// Asynchronously cancel the NPTimer
+/// - Parameter timer: The timer to cancel
 NP_EXTERN void NPDispatchTimerCancel(NPTimer timer);
 
 NP_CEXTERN_END

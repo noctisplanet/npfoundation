@@ -99,17 +99,21 @@ public:
         return this->block->retainCount.load(std::memory_order_relaxed);
     }
     
-    T * get() const {
+    const T * get() const {
         return this->block->get();
     }
     
-    T * operator->() {
+    const T * operator->() const {
+        return this->block->get();
+    }
+    
+    T * acquireUnique() {
         if (this->retainCount() > 1) {
-            T *pointer = new T(*this->get());
+            T *pointer = new T(*this->block->get());
             this->block->release();
             this->block = new Block(pointer);
         }
-        return this->get();
+        return this->block->get();
     }
 };
 
