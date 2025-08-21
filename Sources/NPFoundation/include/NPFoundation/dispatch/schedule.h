@@ -32,9 +32,11 @@
 
 NP_CEXTERN_BEGIN
 
-NP_EXTERN void NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+typedef dispatch_block_t NPScheduleWork;
 
-NP_EXTERN void NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+NP_EXTERN NPScheduleWork NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
+
+NP_EXTERN NPScheduleWork NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback);
 
 NP_CEXTERN_END
 

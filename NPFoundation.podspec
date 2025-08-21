@@ -9,7 +9,7 @@ Pod::Spec.new do |spec|
 
     spec.ios.deployment_target          = '12.2'
     spec.osx.deployment_target          = '11.0'
-    spec.watchos.deployment_target      = '11.0'
+    spec.watchos.deployment_target      = '8.0'
     spec.tvos.deployment_target         = '12.2'
     spec.visionos.deployment_target     = '1.0'
 
