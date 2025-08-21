@@ -21,5 +21,6 @@ let package = Package(
         .testTarget(
             name: "NPFoundationTests",
             dependencies: ["NPFoundation"]),
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )
