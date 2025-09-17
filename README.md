@@ -79,7 +79,7 @@ ds.acquireUnique()->write(...);
 ## Dispatch
 ### Timer
 ```Objective-C
-__weak NSObject *observable = [NSObject new];
+NP_WEAK(NSObject *) observable = [NSObject new];
 NPDispatchTimerObservable(observable, nil, 1, 0, ^{
     // task code
 });

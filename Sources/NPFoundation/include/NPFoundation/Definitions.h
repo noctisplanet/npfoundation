@@ -60,6 +60,8 @@
 
 #define NP_STATIC_INLINE static __inline__
 #define NP_EXTERN_INLINE extern __inline__
+#define NP_BLOCK(TYPE) __block TYPE
+#define NP_WEAK(TYPE) __weak TYPE
 
 #if defined(__cplusplus)
 #define NP_CEXTERN_BEGIN extern "C" {

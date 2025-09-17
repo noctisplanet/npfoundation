@@ -27,42 +27,43 @@
 #include <Foundation/Foundation.h>
 
 NPScheduleWork NPDispatchScheduleThrottle(double delayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
-    static dispatch_queue_t queue = NULL;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dispatch_queue_attr_t attribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
-        queue = dispatch_queue_create("com.dispatch.throttle-queue", attribute);
-    });
-    
-    __block double previous = 0;
-    dispatch_block_t block = ^{
+    NP_BLOCK(double) previous = 0;
+    dispatch_queue_attr_t attribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    dispatch_queue_t queue = dispatch_queue_create("com.dispatch.throttle-queue", attribute);
+    dispatch_block_t resume = ^{
         double timestamp = CFAbsoluteTimeGetCurrent();
         if (timestamp - previous >= delayInSeconds) {
             previous = timestamp;
             dispatch_async(on, callback);
         }
     };
-    return ^{
-        dispatch_async(queue, block);
+    dispatch_block_t cancel = ^ {
+        
     };
+    NPScheduleWork scheduleWork = {
+        .resume = ^{
+            dispatch_async(queue, resume);
+        },
+        .cancel = ^{
+            dispatch_async(queue, cancel);
+        },
+    };
+    return scheduleWork;
 }
 
 NPScheduleWork NPDispatchScheduleDeboundce(double delayInSeconds, double leewayInSeconds, dispatch_queue_t on, dispatch_block_t callback) {
-    static dispatch_queue_t queue = NULL;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dispatch_queue_attr_t attribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
-        queue = dispatch_queue_create("com.dispatch.deboundce-queue", attribute);
-    });
-    
-    __block uint64_t previous = 0;
-    dispatch_block_t block = ^{
-        uint64_t seq = ++previous;
+    NP_BLOCK(bool) canceled = false;
+    NP_BLOCK(UInt64) previous = 0;
+    dispatch_queue_attr_t attribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    dispatch_queue_t queue = dispatch_queue_create("com.dispatch.deboundce-queue", attribute);
+    dispatch_block_t resume = ^{
+        canceled = false;
+        UInt64 seq = ++previous;
         double started = CFAbsoluteTimeGetCurrent();
         dispatch_after(dispatch_walltime(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), queue, ^{
-            if (seq == previous) {
+            if (!canceled && seq == previous) {
                 dispatch_async(on, callback);
-            } else if (previous - seq == 1) {
+            } else if (!canceled && previous - seq == 1) {
                 double ended = CFAbsoluteTimeGetCurrent();
                 double timeout = ended - started - delayInSeconds;
                 if (timeout < leewayInSeconds) {
@@ -71,7 +72,16 @@ NPScheduleWork NPDispatchScheduleDeboundce(double delayInSeconds, double leewayI
             }
         });
     };
-    return ^{
-        dispatch_async(queue, block);
+    dispatch_block_t cancel = ^ {
+        canceled = true;
     };
+    NPScheduleWork scheduleWork = {
+        .resume = ^{
+            dispatch_async(queue, resume);
+        },
+        .cancel = ^{
+            dispatch_async(queue, cancel);
+        },
+    };
+    return scheduleWork;
 }

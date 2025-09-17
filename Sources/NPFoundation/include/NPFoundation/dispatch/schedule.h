@@ -32,12 +32,19 @@
 
 NP_CEXTERN_BEGIN
 
-typedef dispatch_block_t NPScheduleWork;
+struct NPScheduleWork {
+    dispatch_block_t resume;
+    dispatch_block_t cancel;
+};
+typedef struct NPScheduleWork NPScheduleWork;
 
 /// Schedules a throttled execution of a callback function on a specified dispatch queue.
 ///
 /// Throttling ensures the callback is executed at most once within the specified delay period,
 /// regardless of how many times the returned NPScheduleWork function is called.
+///
+/// Calling cancel is ineffective in NPDispatchScheduleThrottle because it executes immediately (from a timeline perspective)
+///
 /// - Parameters:
 ///   - delayInSeconds: The minimum delay (in seconds) between allowed callback executions.
 ///                     Subsequent calls to the returned NPScheduleWork within this delay window will be ignored.
@@ -49,6 +56,8 @@ NP_EXTERN NPScheduleWork NPDispatchScheduleThrottle(double delayInSeconds, dispa
 ///
 /// Debouncing delays the callback execution until after the specified delay has elapsed
 /// without receiving new calls to the returned NPScheduleWork function.
+///
+/// Calling cancel is effective in NPDispatchScheduleDebounce because its tasks are always delayed.
 ///
 /// - Parameters:
 ///   - delayInSeconds: The debounce delay (in seconds) that must pass without new calls

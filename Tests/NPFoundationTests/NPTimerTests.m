@@ -73,20 +73,20 @@
 }
 
 - (void)testTimerRun {
-    __block int count = 0;
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    NP_BLOCK(int) count = 0;
+    XCTestExpectation *expectation = [self expectationWithDescription:@"TIME_FOREVER"];
     NPTimer timer = NPDispatchTimer(nil, 0.5, 0, ^{
         count += 1;
-        dispatch_semaphore_signal(semaphore);
+        [expectation fulfill];
     });
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    [self waitForExpectations:@[expectation] timeout:2];
     XCTAssertTrue(count > 0);
 }
 
 - (void)testObservable {
-    __block int count1 = 0;
-    __block int count2 = 0;
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    NP_BLOCK(int) count1 = 0;
+    NP_BLOCK(int) count2 = 0;
+    XCTestExpectation *expectation = [self expectationWithDescription:@"TIME_FOREVER"];
     dispatch_queue_t queue = dispatch_queue_create("", DISPATCH_QUEUE_SERIAL);
     {
         __block NSObject *value = [NSObject new];
@@ -99,12 +99,12 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), queue, ^{
                 count2 = count1;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), queue, ^{
-                    dispatch_semaphore_signal(semaphore);
+                    [expectation fulfill];
                 });
             });
         });
     }
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    [self waitForExpectations:@[expectation] timeout:5];
     XCTAssertTrue(count1 > 0);
     XCTAssertEqual(count1, count2);
 }

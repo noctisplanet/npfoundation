@@ -35,28 +35,6 @@ NP_CEXTERN_BEGIN
 
 typedef dispatch_source_t NPTimer;
 
-#ifdef __OBJC__
-
-#import <Foundation/Foundation.h>
-
-/// Creates a new timer to monitor low-level system events with automatic lifecycle management.
-///
-/// The timer is automatically activated and its lifecycle is bound to the observable object.
-/// When the observable object is deallocated, the timer will be automatically cancelled.
-///
-/// - Parameters:
-///   - observable: The object to which the timer's lifecycle will be bound.
-///   - dispatchQueue: The dispatch queue to which the event handler block is submitted.
-///   - intervalInSeconds: The seconds interval for the timer.
-///   - leewayInSeconds: The amount of time, in nanoseconds, that the system can defer the timer.
-///   - block: The event handler block to submit to the source’s target queue.
-///            This function performs a Block_copy on behalf of the caller,
-///            and Block_release on the previous handler (if any).
-///            This parameter cannot be NULL.
-NP_EXTERN NPTimer NPDispatchTimerObservable(id observable, dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
-
-#endif /* __OBJC__ */
-
 /// Creates a new timer to monitor low-level system events.
 ///
 /// The timer is automatically activated.
@@ -85,5 +63,30 @@ NP_EXTERN void NPDispatchTimerCancel(NPTimer timer);
 
 NP_CEXTERN_END
 
+#ifdef __OBJC__
+
+#import <Foundation/Foundation.h>
+
+NP_CEXTERN_BEGIN
+
+/// Creates a new timer to monitor low-level system events with automatic lifecycle management.
+///
+/// The timer is automatically activated and its lifecycle is bound to the observable object.
+/// When the observable object is deallocated, the timer will be automatically cancelled.
+///
+/// - Parameters:
+///   - observable: The object to which the timer's lifecycle will be bound.
+///   - dispatchQueue: The dispatch queue to which the event handler block is submitted.
+///   - intervalInSeconds: The seconds interval for the timer.
+///   - leewayInSeconds: The amount of time, in nanoseconds, that the system can defer the timer.
+///   - block: The event handler block to submit to the source’s target queue.
+///            This function performs a Block_copy on behalf of the caller,
+///            and Block_release on the previous handler (if any).
+///            This parameter cannot be NULL.
+NP_EXTERN NPTimer NPDispatchTimerObservable(id observable, dispatch_queue_t dispatchQueue, double intervalInSeconds, double leewayInSeconds, dispatch_block_t block);
+
+NP_CEXTERN_END
+
+#endif /* __OBJC__ */
 #endif /* __BLOCKS__ */
 #endif /* NP_DISPATCH_TIMER_H */
