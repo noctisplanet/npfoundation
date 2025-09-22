@@ -37,27 +37,40 @@ NP_NAMESPACE_BEGIN(NP)
 
 class Diagnostics {
     
+public:
+    
+    enum class Behavior {
+        debug, info, warning, error
+    };
+    
+    struct Message {
+        Behavior behavior;
+        std::string text;
+    };
+    
 private:
     
-    FILE *Stream;
+    FILE *stream;
     
-    const bool Verbose = false;
+    const std::string prefix;
     
-    const std::string Prefix;
-    
-    std::set<std::string> Errors;
+    std::vector<Message> errors;
     
 public:
     
-    Diagnostics(FILE *Stream = stderr, bool verbose=false);
+    Diagnostics(FILE *stream = stderr);
     
-    Diagnostics(const std::string& prefix, FILE *stream = stderr, bool verbose=false);
+    Diagnostics(const std::string& prefix, FILE *stream = stderr);
     
 public:
     
-    void note(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void append(const Message &message);
     
-    void verbose(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void append(Behavior behavior, const char* format, va_list args);
+    
+    void debug(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    
+    void info(const char* format, ...) __attribute__((format(printf, 2, 3)));
     
     void warning(const char* format, ...) __attribute__((format(printf, 2, 3)));
     

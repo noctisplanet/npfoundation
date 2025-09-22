@@ -29,86 +29,76 @@
 
 NP_NAMESPACE_BEGIN(NP)
 
-Diagnostics::Diagnostics(FILE *stream, bool verbose) : Stream(stream), Verbose(verbose) {
+Diagnostics::Diagnostics(FILE *stream) : stream(stream) {
     
 }
 
-Diagnostics::Diagnostics(const std::string& prefix, FILE *stream, bool verbose) : Prefix(prefix), Stream(stream), Verbose(verbose) {
+Diagnostics::Diagnostics(const std::string& prefix, FILE *stream) : prefix(prefix), stream(stream) {
     
 }
 
-void Diagnostics::note(const char* format, ...) {
+void Diagnostics::append(const Message &message) {
+    if (!prefix.empty()) {
+        ::fprintf(stream, "[%s] ", prefix.c_str());
+    }
+    ::fprintf(stream, "%s", message.text.c_str());
+    ::fprintf(stream, "\n");
+    if (message.behavior == Behavior::error) {
+        errors.insert(errors.end(), message);
+    }
+}
+
+
+void Diagnostics::append(Behavior behavior, const char* format, va_list args) {
+    va_list list;
+    va_copy(list, args);
+    int length = vsnprintf(nullptr, 0, format, list);
+    va_end(list);
+    if (length <= 0)
+        return;
+    std::vector<char> buf(length + 1);
+    vsnprintf(buf.data(), buf.size(), format, args);
+    this->append({behavior, std::string(buf.data(), length)});
+}
+
+void Diagnostics::debug(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    if (!Prefix.empty()) {
-        ::fprintf(Stream, "[%s] ", Prefix.c_str());
-    }
-    ::vfprintf(Stream, format, args);
+    this->append(Behavior::debug, format, args);
     va_end(args);
-    ::fprintf(Stream, "\n");
 }
 
-void Diagnostics::verbose(const char* format, ...) {
-    if (Verbose) {
-        va_list args;
-        va_start(args, format);
-        if (!Prefix.empty()) {
-            ::fprintf(Stream, "[%s] ", Prefix.c_str());
-        }
-        ::vfprintf(Stream, format, args);
-        va_end(args);
-        ::fprintf(Stream, "\n");
-    }
+void Diagnostics::info(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    this->append(Behavior::info, format, args);
+    va_end(args);
 }
 
 void Diagnostics::warning(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    if (Verbose) {
-        ::fprintf(Stream, "[warning]");
-    }
-    if (!Prefix.empty()) {
-        ::fprintf(Stream, "[%s] ", Prefix.c_str());
-    }
-    ::vfprintf(Stream, format, args);
+    this->append(Behavior::warning, format, args);
     va_end(args);
-    ::fprintf(Stream, "\n");
 }
 
 void Diagnostics::error(const char* format, ...) {
-    std::string str;
     va_list args;
     va_start(args, format);
-    auto len = vsnprintf(nullptr, 0, format, args);
+    this->append(Behavior::error, format, args);
     va_end(args);
-    if (len > 0) {
-        auto size = len + 1;
-        str.resize(size);
-        va_start(args, format);
-        vsnprintf((char *)str.data(), size, format, args);
-        va_end(args);
-        Errors.insert(str);
-        if (Verbose) {
-            ::fprintf(Stream, "[error]");
-        }
-        if (!Prefix.empty()) {
-            ::fprintf(Stream, "[%s] ", Prefix.c_str());
-        }
-        ::fprintf(Stream, "%s", str.c_str());
-        ::fprintf(Stream, "\n");
-    }
 }
 
 bool Diagnostics::hasError() const {
-    return !Errors.empty();
+    return !errors.empty();
 }
 
 bool Diagnostics::noError() const {
-    return Errors.empty();
+    return errors.empty();
 }
 
 void Diagnostics::clearError() {
-    return Errors.clear();
+    return errors.clear();
 }
 
 void Diagnostics::assertNoError() const {

@@ -34,44 +34,37 @@ using namespace NP;
 
 @implementation DiagnosticsTests
 
-- (void)testNode {
+- (void)testDebug {
     Diagnostics diagnostics;
-    diagnostics.note("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.debug("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertFalse(diagnostics.hasError());
     XCTAssertTrue(diagnostics.noError());
 }
 
-- (void)testPrefixNode {
+- (void)testPrefixDebug {
     Diagnostics diagnostics{"test"};
-    diagnostics.note("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.debug("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertFalse(diagnostics.hasError());
     XCTAssertTrue(diagnostics.noError());
 }
 
 - (void)testWarning {
     Diagnostics diagnostics;
-    diagnostics.warning("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.warning("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertFalse(diagnostics.hasError());
     XCTAssertTrue(diagnostics.noError());
 }
 
 - (void)testPrefixWarning {
     Diagnostics diagnostics{"test"};
-    diagnostics.warning("%fs", CFAbsoluteTimeGetCurrent());
-    XCTAssertFalse(diagnostics.hasError());
-    XCTAssertTrue(diagnostics.noError());
-}
-
-- (void)testVerboseWarning {
-    Diagnostics diagnostics{"test", stderr, true};
-    diagnostics.warning("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.warning("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertFalse(diagnostics.hasError());
     XCTAssertTrue(diagnostics.noError());
 }
 
 - (void)testError {
     Diagnostics diagnostics;
-    diagnostics.error("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.error("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertTrue(diagnostics.hasError());
     XCTAssertFalse(diagnostics.noError());
     diagnostics.clearError();
@@ -81,17 +74,7 @@ using namespace NP;
 
 - (void)testPrefixError {
     Diagnostics diagnostics{"test"};
-    diagnostics.error("%fs", CFAbsoluteTimeGetCurrent());
-    XCTAssertTrue(diagnostics.hasError());
-    XCTAssertFalse(diagnostics.noError());
-    diagnostics.clearError();
-    XCTAssertFalse(diagnostics.hasError());
-    XCTAssertTrue(diagnostics.noError());
-}
-
-- (void)testVerboseError {
-    Diagnostics diagnostics{"test", stderr, true};
-    diagnostics.error("%fs", CFAbsoluteTimeGetCurrent());
+    diagnostics.error("%s %fs", __func__, CFAbsoluteTimeGetCurrent());
     XCTAssertTrue(diagnostics.hasError());
     XCTAssertFalse(diagnostics.noError());
     diagnostics.clearError();
