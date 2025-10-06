@@ -22,5 +22,5 @@ let package = Package(
             name: "NPFoundationTests",
             dependencies: ["NPFoundation"]),
     ],
-    cxxLanguageStandard: .cxx17
+    cxxLanguageStandard: .cxx20
 )

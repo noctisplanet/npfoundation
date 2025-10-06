@@ -28,8 +28,9 @@
 
 #ifdef __cplusplus
 
-#include <NPFoundation/Definitions.h>
 #include <atomic>
+#include <forward_list>
+#include <NPFoundation/Definitions.h>
 
 NP_NAMESPACE_BEGIN(NP)
 
