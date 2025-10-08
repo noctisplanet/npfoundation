@@ -30,3 +30,4 @@
 #include <NPFoundation/machine.h>
 #include <NPFoundation/objc.h>
 #include <NPFoundation/DataStructures.h>
+#include <NPFoundation/sys.h>

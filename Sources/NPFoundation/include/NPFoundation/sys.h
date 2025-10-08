@@ -1,8 +1,8 @@
 //
-//  Diagnostics.h
+//  sys.h
 //  npfoundation
 //
-//  Created by Jonathan Lee on 6/22/25.
+//  Created by Jonathan Lee on 10/6/25.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,72 +23,47 @@
 //  SOFTWARE.
 //
 
-#ifndef NP_DIAGNOSTICS_H
-#define NP_DIAGNOSTICS_H
+#ifndef NP_SYS_H
+#define NP_SYS_H
 
 #ifdef __cplusplus
 
 #include <NPFoundation/Definitions.h>
-#include <stdarg.h>
-#include <string>
-#include <set>
+#include <NPFoundation/Diagnostics.h>
+#include <sys/stat.h>
 
 NP_NAMESPACE_BEGIN(NP)
+NP_NAMESPACE_BEGIN(Sys)
 
-class Diagnostics {
-    
-public:
-    
-    enum class Behavior {
-        debug, info, warning, error
-    };
-    
-    struct Message {
-        Behavior behavior;
-        std::string text;
-    };
-    
-private:
-    
-    FILE *stream;
-    
-    const std::string prefix;
-    
-    std::vector<Message> errors;
-    
-public:
-    
-    Diagnostics(FILE *stream = nullptr);
-    
-    Diagnostics(const std::string& prefix, FILE *stream = nullptr);
-    
-public:
-    
-    void append(const Message &message);
-    
-    void append(Behavior behavior, const char* format, va_list args);
-    
-    void debug(const char* format, ...) __attribute__((format(printf, 2, 3)));
-    
-    void info(const char* format, ...) __attribute__((format(printf, 2, 3)));
-    
-    void warning(const char* format, ...) __attribute__((format(printf, 2, 3)));
-    
-    void error(const char* format, ...) __attribute__((format(printf, 2, 3)));
-    
-public:
-    
-    bool hasError() const;
-    
-    bool noError() const;
-    
-    void clearError();
-    
-    void assertNoError() const;
-};
+int open(Diagnostics& diag, const char *path, int flag, int other) noexcept;
 
+void close(Diagnostics& diag, int fd) noexcept;
+
+void stat(Diagnostics& diag, const char *path, struct ::stat *buf) noexcept;
+
+void fstatat(Diagnostics& diag, int fd, const char *path, struct ::stat *buf, int flag) noexcept;
+
+void truncate(Diagnostics& diag, const char *path, size_t size) noexcept;
+
+void ftruncate(Diagnostics& diag, int fd, size_t size) noexcept;
+
+void cwd(Diagnostics& diag, char *output) noexcept;
+
+void realpath(Diagnostics& diag, const char *input, char *output) noexcept;
+
+bool dirExists(const char *path) noexcept;
+
+bool fileExists(const char *path) noexcept;
+
+const void * mmapReadOnly(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept;
+
+void * mmapReadWrite(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept;
+
+void munmap(Diagnostics& diag, void *buf, size_t size);
+
+NP_NAMESPACE_END
 NP_NAMESPACE_END
 
 #endif /* __cplusplus */
 
-#endif /* NP_DIAGNOSTICS_H */
+#endif /* NP_SYS_H */

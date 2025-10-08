@@ -38,11 +38,13 @@ Diagnostics::Diagnostics(const std::string& prefix, FILE *stream) : prefix(prefi
 }
 
 void Diagnostics::append(const Message &message) {
-    if (!prefix.empty()) {
-        ::fprintf(stream, "[%s] ", prefix.c_str());
+    if (stream != nullptr) {
+        if (!prefix.empty()) {
+            ::fprintf(stream, "[%s] ", prefix.c_str());
+        }
+        ::fprintf(stream, "%s", message.text.c_str());
+        ::fprintf(stream, "\n");
     }
-    ::fprintf(stream, "%s", message.text.c_str());
-    ::fprintf(stream, "\n");
     if (message.behavior == Behavior::error) {
         errors.insert(errors.end(), message);
     }
