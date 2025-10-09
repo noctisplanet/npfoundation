@@ -57,11 +57,15 @@ bool fileExists(const char *path) noexcept;
 
 const void * mmapReadOnly(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept;
 
+#ifdef __BLOCKS__
+
+void withMmapReadOnly(Diagnostics &diag, const char *path, void (^handler)(const void *mapping, size_t size, const char* realerPath)) noexcept;
+
+#endif /* __BLOCKS__ */
+
 void * mmapReadWrite(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept;
 
 void munmap(Diagnostics &diag, void *buf, size_t size) noexcept;
-
-const void * read(Diagnostics &diag, const char *path, size_t *size) noexcept;
 
 NP_NAMESPACE_END
 NP_NAMESPACE_END

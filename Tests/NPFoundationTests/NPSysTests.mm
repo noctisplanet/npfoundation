@@ -28,39 +28,93 @@
 
 @interface NPSysTests : XCTestCase
 
+@property (nonatomic, strong) NSString *temporaryDirectory;
+@property (nonatomic, strong) NSString *testFile;
+
 @end
 
 @implementation NPSysTests
 
 - (void)setUp {
-    struct stat buf;
-    NP::Diagnostics diag;
-    NP::Sys::stat(diag, ".", &buf);
-    char cwd[PATH_MAX];
-    NP::Sys::cwd(diag, cwd);
-    
-    bool w = NP::Sys::dirExists("/Users/jon/Downloads/CertificateSigningRequest");
-    bool x = NP::Sys::dirExists("/Users/jon/Downloads/CertificateSigningRequest.certSigningRequest");
-    bool y = NP::Sys::dirExists("/Users/jon/Downloads");
-    bool z = NP::Sys::dirExists(".");
-    
-    bool w1 = NP::Sys::fileExists("/Users/jon/Downloads/CertificateSigningRequest");
-    bool x1 = NP::Sys::fileExists("/Users/jon/Downloads/CertificateSigningRequest.certSigningRequest");
-    bool y1 = NP::Sys::fileExists("/Users/jon/Downloads");
-    bool z1 = NP::Sys::fileExists(".");
-    
-    printf("");
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+    [super setUp];
+    self.temporaryDirectory = NSTemporaryDirectory();
+    self.testFile = [self.temporaryDirectory stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    [[NSFileManager defaultManager] removeItemAtPath:self.testFile error:nil];
 }
-
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+    [[NSFileManager defaultManager] removeItemAtPath:self.testFile error:nil];
+    [super tearDown];
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+- (void)testOpenCreateNewFile {
+    NP::Diagnostics diag;
+    int fd = NP::Sys::open(diag, [self.testFile UTF8String], O_CREAT | O_RDWR, 0644);
+    XCTAssertFalse(diag.hasError());
+    XCTAssertTrue(fd >= 0);
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:self.testFile]);
+    if (fd >= 0) {
+        NP::Sys::close(diag, fd);
+    }
+}
+
+- (void)testOpenExistingFileForReading {
+    [@"Hello, World!" writeToFile:self.testFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
+    NP::Diagnostics diag;
+    int fd = NP::Sys::open(diag, [self.testFile UTF8String], O_RDONLY, 0);
+    XCTAssertFalse(diag.hasError());
+    XCTAssertTrue(fd >= 0);
+    if (fd >= 0) {
+        NP::Sys::close(diag, fd);
+    }
+}
+
+- (void)testOpenNonExistentFileWithoutCreate {
+    NP::Diagnostics diag;
+    int fd = NP::Sys::open(diag, [self.testFile UTF8String], O_RDONLY, 0);
+    XCTAssertTrue(fd < 0);
+    XCTAssertTrue(diag.hasError());
+    XCTAssertEqual(errno, ENOENT);
+}
+
+- (void)testOpenWithExclusiveCreate {
+    [@"Hello, World!" writeToFile:self.testFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
+    NP::Diagnostics diag;
+    int fd = NP::Sys::open(diag, [self.testFile UTF8String], O_CREAT | O_EXCL | O_RDWR, 0);
+    XCTAssertTrue(fd < 0);
+    XCTAssertTrue(diag.hasError());
+    XCTAssertEqual(errno, EEXIST);
+}
+
+- (void)testOpenWithInvalidPath {
+    NP::Diagnostics diag;
+    int fd = NP::Sys::open(diag, "x", O_RDONLY, 0);
+    XCTAssertTrue(fd < 0);
+    XCTAssertTrue(diag.hasError());
+}
+
+- (void)testMmapReadOnlySuccess {
+    [@"Hello, World!" writeToFile:self.testFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
+    NP::Diagnostics diag;
+    size_t size = 0;
+    const void *mapping = NP::Sys::mmapReadOnly(diag, [self.testFile UTF8String], &size, nullptr);
+    XCTAssertNotEqual(mapping, nullptr);
+    XCTAssertFalse(diag.hasError());
+    XCTAssertTrue(size == 13);
+    XCTAssertTrue(::strncmp("Hello, World!", (char *)mapping, size) == 0);
+    NP::Sys::munmap(diag, (char *)mapping, size);
+    XCTAssertFalse(diag.hasError());
+}
+
+- (void)testMmapReadOnlyFailed {
+    NP::Diagnostics diag;
+    size_t size = 0;
+    const void *mapping = NP::Sys::mmapReadOnly(diag, [self.testFile UTF8String], &size, nullptr);
+    XCTAssertEqual(mapping, nullptr);
+    XCTAssertTrue(diag.hasError());
 }
 
 - (void)testPerformanceExample {

@@ -38,11 +38,7 @@ int open(Diagnostics &diag, const char *path, int flag, int other) noexcept {
     } while ((fd < 0) && ((errno == EAGAIN) || (errno == EINTR)));
     if (fd < 0) {
         int err = errno;
-        if (err == ENOENT) {
-            diag.error("no such file");
-        } else {
-            diag.error("open() failed with errno=%d, %s", err, strerror(err));
-        }
+        diag.error("open() failed with errno=%d, %s", err, strerror(err));
     }
     return fd;
 }
@@ -58,11 +54,7 @@ void stat(Diagnostics &diag, const char *path, struct ::stat *buf) noexcept {
     } while ((result == -1) && ((errno == EAGAIN) || (errno == EINTR)));
     if (result != 0) {
         int err = errno;
-        if (err == ENOENT) {
-            diag.error("no such file");
-        } else {
-            diag.error("stat() failed with errno=%d, %s", err, strerror(err));
-        }
+        diag.error("stat() failed with errno=%d, %s", err, strerror(err));
     }
 }
 
@@ -73,11 +65,7 @@ void fstatat(Diagnostics &diag, int fd, const char *path, struct ::stat *buf, in
     } while ((result == -1) && ((errno == EAGAIN) || (errno == EINTR)));
     if (result != 0) {
         int err = errno;
-        if (err == ENOENT) {
-            diag.error("no such file");
-        } else {
-            diag.error("fstatat() failed with errno=%d, %s", err, strerror(err));
-        }
+        diag.error("fstatat() failed with errno=%d, %s", err, strerror(err));
     }
 }
 
@@ -88,11 +76,7 @@ void truncate(Diagnostics &diag, const char *path, size_t size) noexcept {
     } while ((result == -1) && ((errno == EAGAIN) || (errno == EINTR)));
     if (result != 0) {
         int err = errno;
-        if (err == ENOENT) {
-            diag.error("no such file");
-        } else {
-            diag.error("truncate() failed with errno=%d, %s", err, strerror(err));
-        }
+        diag.error("truncate() failed with errno=%d, %s", err, strerror(err));
     }
 }
 
@@ -103,11 +87,7 @@ void ftruncate(Diagnostics &diag, int fd, size_t size) noexcept {
     } while ((result == -1) && ((errno == EAGAIN) || (errno == EINTR)));
     if (result != 0) {
         int err = errno;
-        if (err == ENOENT) {
-            diag.error("no such file");
-        } else {
-            diag.error("ftruncate() failed with errno=%d, %s", err, strerror(err));
-        }
+        diag.error("ftruncate() failed with errno=%d, %s", err, strerror(err));
     }
 }
 
@@ -174,7 +154,7 @@ const void * mmapReadOnly(Diagnostics &diag, const char *path, size_t *size, cha
     if (result == MAP_FAILED) {
         diag.error("mmap(size=0x%0lX) failed with errno=%d", (size_t)statbuf.st_size, errno);
         close(diag, fd);
-        return nullptr;
+        return MAP_FAILED;
     }
     if (realerPath != nullptr) {
         Diagnostics diag{nullptr};
@@ -182,6 +162,15 @@ const void * mmapReadOnly(Diagnostics &diag, const char *path, size_t *size, cha
     }
     close(diag, fd);
     return result;
+}
+
+void withMmapReadOnly(Diagnostics &diag, const char *path, void (^handler)(const void *mapping, size_t size, const char* realerPath)) noexcept {
+    size_t mappedSize;
+    char realerPath[PATH_MAX];
+    if (const void *mapping = mmapReadOnly(diag, path, &mappedSize, realerPath)) {
+        handler(mapping, mappedSize, realerPath);
+        munmap(diag, (void *)mapping, mappedSize);
+    }
 }
 
 void * mmapReadWrite(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept {
@@ -225,28 +214,6 @@ void munmap(Diagnostics &diag, void *buf, size_t size) noexcept {
     if (::munmap(buf, size) != 0) {
         diag.error("munmap() failed with errno=%d, %s", errno, strerror(errno));
     }
-}
-
-const void * read(Diagnostics &diag, const char *path, size_t *size) noexcept {
-    struct stat statbuf;
-    stat(diag, path, &statbuf);
-    if (diag.hasError()) {
-        return nullptr;
-    }
-    if (statbuf.st_size == 0) {
-        return nullptr;
-    }
-    
-    int fd = open(diag, path, O_RDONLY, 0);
-    if (diag.hasError()) {
-        return nullptr;
-    }
-    if (size != nullptr) {
-        *size = (size_t)statbuf.st_size;
-    }
-    
-    
-    return nullptr;
 }
 
 NP_NAMESPACE_END
