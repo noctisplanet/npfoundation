@@ -60,21 +60,21 @@ public:
     
     Diagnostics(FILE *stream = nullptr);
     
-    Diagnostics(const std::string& prefix, FILE *stream = nullptr);
+    Diagnostics(const std::string &prefix, FILE *stream = nullptr);
     
 public:
     
     void append(const Message &message);
     
-    void append(Behavior behavior, const char* format, va_list args);
+    void append(Behavior behavior, const char *format, va_list args);
     
-    void debug(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void debug(const char *format, ...) __attribute__((format(printf, 2, 3)));
     
-    void info(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void info(const char *format, ...) __attribute__((format(printf, 2, 3)));
     
-    void warning(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void warning(const char *format, ...) __attribute__((format(printf, 2, 3)));
     
-    void error(const char* format, ...) __attribute__((format(printf, 2, 3)));
+    void error(const char *format, ...) __attribute__((format(printf, 2, 3)));
     
 public:
     

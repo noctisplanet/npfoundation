@@ -31,7 +31,7 @@
 NP_NAMESPACE_BEGIN(NP)
 NP_NAMESPACE_BEGIN(Sys)
 
-int open(Diagnostics& diag, const char *path, int flag, int other) noexcept {
+int open(Diagnostics &diag, const char *path, int flag, int other) noexcept {
     int fd;
     do {
         fd = ::open(path, flag, other);
@@ -47,11 +47,11 @@ int open(Diagnostics& diag, const char *path, int flag, int other) noexcept {
     return fd;
 }
 
-void close(Diagnostics& diag, int fd) noexcept {
+void close(Diagnostics &diag, int fd) noexcept {
     ::close(fd);
 }
 
-void stat(Diagnostics& diag, const char *path, struct ::stat *buf) noexcept {
+void stat(Diagnostics &diag, const char *path, struct ::stat *buf) noexcept {
     int result;
     do {
         result = ::stat(path, buf);
@@ -66,7 +66,7 @@ void stat(Diagnostics& diag, const char *path, struct ::stat *buf) noexcept {
     }
 }
 
-void fstatat(Diagnostics& diag, int fd, const char *path, struct ::stat *buf, int flag) noexcept {
+void fstatat(Diagnostics &diag, int fd, const char *path, struct ::stat *buf, int flag) noexcept {
     int result;
     do {
         result = ::fstatat(fd, path, buf, flag);
@@ -81,7 +81,7 @@ void fstatat(Diagnostics& diag, int fd, const char *path, struct ::stat *buf, in
     }
 }
 
-void truncate(Diagnostics& diag, const char *path, size_t size) noexcept {
+void truncate(Diagnostics &diag, const char *path, size_t size) noexcept {
     int result;
     do {
         result = ::truncate(path, size);
@@ -96,7 +96,7 @@ void truncate(Diagnostics& diag, const char *path, size_t size) noexcept {
     }
 }
 
-void ftruncate(Diagnostics& diag, int fd, size_t size) noexcept {
+void ftruncate(Diagnostics &diag, int fd, size_t size) noexcept {
     int result;
     do {
         result = ::ftruncate(fd, size);
@@ -111,7 +111,7 @@ void ftruncate(Diagnostics& diag, int fd, size_t size) noexcept {
     }
 }
 
-void cwd(Diagnostics& diag, char *output) noexcept {
+void cwd(Diagnostics &diag, char *output) noexcept {
     int fd = open(diag, ".", O_RDONLY | O_DIRECTORY, 0);
     if (diag.hasError()) {
         return;
@@ -122,7 +122,7 @@ void cwd(Diagnostics& diag, char *output) noexcept {
     close(diag, fd);
 }
 
-void realpath(Diagnostics& diag, const char *input, char *output) noexcept {
+void realpath(Diagnostics &diag, const char *input, char *output) noexcept {
     int fd = open(diag, input, O_RDONLY | O_DIRECTORY, 0);
     if (diag.hasError()) {
         return;
@@ -152,7 +152,7 @@ bool fileExists(const char *path) noexcept {
     return S_ISREG(statbuf.st_mode);;
 }
 
-const void * mmapReadOnly(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept {
+const void * mmapReadOnly(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept {
     struct stat statbuf;
     stat(diag, path, &statbuf);
     if (diag.hasError()) {
@@ -184,7 +184,7 @@ const void * mmapReadOnly(Diagnostics& diag, const char *path, size_t *size, cha
     return result;
 }
 
-void * mmapReadWrite(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept {
+void * mmapReadWrite(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept {
     int fd = open(diag, path, O_RDWR | O_CREAT, 0666);
     if (diag.hasError()) {
         return nullptr;
@@ -221,10 +221,32 @@ void * mmapReadWrite(Diagnostics& diag, const char *path, size_t *size, char *re
     return result;
 }
 
-void munmap(Diagnostics& diag, void *buf, size_t size) {
+void munmap(Diagnostics &diag, void *buf, size_t size) noexcept {
     if (::munmap(buf, size) != 0) {
         diag.error("munmap() failed with errno=%d, %s", errno, strerror(errno));
     }
+}
+
+const void * read(Diagnostics &diag, const char *path, size_t *size) noexcept {
+    struct stat statbuf;
+    stat(diag, path, &statbuf);
+    if (diag.hasError()) {
+        return nullptr;
+    }
+    if (statbuf.st_size == 0) {
+        return nullptr;
+    }
+    
+    int fd = open(diag, path, O_RDONLY, 0);
+    if (diag.hasError()) {
+        return nullptr;
+    }
+    if (size != nullptr) {
+        *size = (size_t)statbuf.st_size;
+    }
+    
+    
+    return nullptr;
 }
 
 NP_NAMESPACE_END

@@ -35,31 +35,33 @@
 NP_NAMESPACE_BEGIN(NP)
 NP_NAMESPACE_BEGIN(Sys)
 
-int open(Diagnostics& diag, const char *path, int flag, int other) noexcept;
+int open(Diagnostics &diag, const char *path, int flag, int other) noexcept;
 
-void close(Diagnostics& diag, int fd) noexcept;
+void close(Diagnostics &diag, int fd) noexcept;
 
-void stat(Diagnostics& diag, const char *path, struct ::stat *buf) noexcept;
+void stat(Diagnostics &diag, const char *path, struct ::stat *buf) noexcept;
 
-void fstatat(Diagnostics& diag, int fd, const char *path, struct ::stat *buf, int flag) noexcept;
+void fstatat(Diagnostics &diag, int fd, const char *path, struct ::stat *buf, int flag) noexcept;
 
-void truncate(Diagnostics& diag, const char *path, size_t size) noexcept;
+void truncate(Diagnostics &diag, const char *path, size_t size) noexcept;
 
-void ftruncate(Diagnostics& diag, int fd, size_t size) noexcept;
+void ftruncate(Diagnostics &diag, int fd, size_t size) noexcept;
 
-void cwd(Diagnostics& diag, char *output) noexcept;
+void cwd(Diagnostics &diag, char *output) noexcept;
 
-void realpath(Diagnostics& diag, const char *input, char *output) noexcept;
+void realpath(Diagnostics &diag, const char *input, char *output) noexcept;
 
 bool dirExists(const char *path) noexcept;
 
 bool fileExists(const char *path) noexcept;
 
-const void * mmapReadOnly(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept;
+const void * mmapReadOnly(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept;
 
-void * mmapReadWrite(Diagnostics& diag, const char *path, size_t *size, char *realerPath) noexcept;
+void * mmapReadWrite(Diagnostics &diag, const char *path, size_t *size, char *realerPath) noexcept;
 
-void munmap(Diagnostics& diag, void *buf, size_t size);
+void munmap(Diagnostics &diag, void *buf, size_t size) noexcept;
+
+const void * read(Diagnostics &diag, const char *path, size_t *size) noexcept;
 
 NP_NAMESPACE_END
 NP_NAMESPACE_END

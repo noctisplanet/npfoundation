@@ -33,7 +33,7 @@ Diagnostics::Diagnostics(FILE *stream) : stream(stream) {
     
 }
 
-Diagnostics::Diagnostics(const std::string& prefix, FILE *stream) : prefix(prefix), stream(stream) {
+Diagnostics::Diagnostics(const std::string &prefix, FILE *stream) : prefix(prefix), stream(stream) {
     
 }
 
@@ -51,7 +51,7 @@ void Diagnostics::append(const Message &message) {
 }
 
 
-void Diagnostics::append(Behavior behavior, const char* format, va_list args) {
+void Diagnostics::append(Behavior behavior, const char *format, va_list args) {
     va_list list;
     va_copy(list, args);
     int length = vsnprintf(nullptr, 0, format, list);
@@ -63,28 +63,28 @@ void Diagnostics::append(Behavior behavior, const char* format, va_list args) {
     this->append({behavior, std::string(buf.data(), length)});
 }
 
-void Diagnostics::debug(const char* format, ...) {
+void Diagnostics::debug(const char *format, ...) {
     va_list args;
     va_start(args, format);
     this->append(Behavior::debug, format, args);
     va_end(args);
 }
 
-void Diagnostics::info(const char* format, ...) {
+void Diagnostics::info(const char *format, ...) {
     va_list args;
     va_start(args, format);
     this->append(Behavior::info, format, args);
     va_end(args);
 }
 
-void Diagnostics::warning(const char* format, ...) {
+void Diagnostics::warning(const char *format, ...) {
     va_list args;
     va_start(args, format);
     this->append(Behavior::warning, format, args);
     va_end(args);
 }
 
-void Diagnostics::error(const char* format, ...) {
+void Diagnostics::error(const char *format, ...) {
     va_list args;
     va_start(args, format);
     this->append(Behavior::error, format, args);
